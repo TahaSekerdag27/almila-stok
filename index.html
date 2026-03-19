@@ -8,6 +8,108 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: Arial, sans-serif; background: #f7f7f7; color: #333; font-size: 15px; }
 
+/* ── GİRİŞ EKRANI ── */
+#giris-ekrani {
+  display: none;
+  position: fixed; inset: 0;
+  background: #f0f4f7;
+  z-index: 8000;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 0;
+}
+#giris-ekrani.goster { display: flex; }
+.giris-kutu {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 36px 32px;
+  width: 360px;
+  max-width: 95vw;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.10);
+}
+.giris-logo { font-size: 22px; font-weight: bold; color: #444; margin-bottom: 4px; }
+.giris-logo span { color: #5b8fa8; }
+.giris-alt { font-size: 13px; color: #aaa; margin-bottom: 24px; }
+.giris-alan { margin-bottom: 14px; }
+.giris-alan label { display: block; font-size: 12px; font-weight: bold; color: #666; margin-bottom: 5px; }
+.giris-alan input {
+  width: 100%; padding: 10px 12px;
+  border: 1px solid #ccc; border-radius: 6px;
+  font-size: 14px; font-family: Arial, sans-serif; color: #333;
+}
+.giris-alan input:focus { outline: none; border-color: #5b8fa8; }
+.giris-alan input.hata { border-color: #c0392b; }
+.giris-hata { font-size: 12px; color: #c0392b; margin-bottom: 12px; min-height: 16px; }
+.giris-btn {
+  width: 100%; padding: 11px;
+  background: #5b8fa8; color: #fff;
+  border: none; border-radius: 6px;
+  font-size: 15px; font-weight: bold;
+  cursor: pointer; font-family: Arial, sans-serif;
+  transition: background 0.15s;
+}
+.giris-btn:hover { background: #4a7d96; }
+.giris-btn:disabled { background: #aac4d4; cursor: not-allowed; }
+
+/* Çıkış butonu */
+.cikis-btn {
+  font-size: 12px; color: #aaa; cursor: pointer;
+  background: none; border: none; font-family: Arial, sans-serif;
+  padding: 2px 4px; text-decoration: underline;
+}
+.cikis-btn:hover { color: #c0392b; }
+
+/* ── FIREBASE KURULUM EKRANI ── */
+#kurulum-ekrani {
+  display: none;
+  position: fixed; inset: 0;
+  background: #f0f4f7;
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+}
+#kurulum-ekrani.goster { display: flex; }
+.kurulum-kutu {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 32px;
+  width: 540px;
+  max-width: 96vw;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+.kurulum-kutu h2 { font-size: 18px; color: #333; margin-bottom: 6px; }
+.kurulum-kutu .alt { font-size: 13px; color: #888; margin-bottom: 20px; }
+.adim { display: flex; gap: 12px; margin-bottom: 14px; align-items: flex-start; }
+.adim-no { width: 24px; height: 24px; border-radius: 50%; background: #5b8fa8; color: #fff; font-size: 12px; font-weight: bold; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+.adim-icerik { flex: 1; font-size: 13px; color: #444; line-height: 1.5; }
+.adim-icerik code { background: #f0f4f7; padding: 2px 6px; border-radius: 3px; font-family: monospace; font-size: 12px; color: #5b8fa8; }
+.kurulum-form { margin-top: 20px; border-top: 1px solid #eee; padding-top: 20px; }
+.kurulum-form label { display: block; font-size: 12px; font-weight: bold; color: #666; margin-bottom: 4px; }
+.kurulum-form input {
+  width: 100%; padding: 9px 11px; border: 1px solid #ccc; border-radius: 5px;
+  font-size: 13px; font-family: monospace; color: #333; margin-bottom: 10px;
+}
+.kurulum-form input:focus { outline: none; border-color: #5b8fa8; }
+.kurulum-form input.hata { border-color: #c0392b; }
+.kurulum-hata-mesaj { font-size: 12px; color: #c0392b; margin-bottom: 10px; display: none; }
+.kurulum-hata-mesaj.goster { display: block; }
+
+/* ── SYNC DURUM ÇUBUĞU ── */
+.sync-bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: transparent;
+  z-index: 300;
+  transition: background 0.3s;
+}
+.sync-bar.yukleniyor { background: linear-gradient(90deg, #5b8fa8 0%, #a8d4e8 50%, #5b8fa8 100%); background-size: 200%; animation: sync-anim 1.2s linear infinite; }
+.sync-bar.hata { background: #c0392b; }
+@keyframes sync-anim { 0%{background-position:0%} 100%{background-position:200%} }
+
 /* ── HEADER ── */
 .header {
   background: #fff;
@@ -16,60 +118,31 @@ body { font-family: Arial, sans-serif; background: #f7f7f7; color: #333; font-si
   display: flex;
   align-items: stretch;
   justify-content: space-between;
-  gap: 0;
   position: sticky;
   top: 0;
   z-index: 200;
 }
-.header-logo {
-  font-size: 17px;
-  font-weight: bold;
-  color: #444;
-  padding: 14px 20px 14px 0;
-  white-space: nowrap;
-}
+.header-logo { font-size: 17px; font-weight: bold; color: #444; padding: 14px 20px 14px 0; white-space: nowrap; }
 .header-logo span { color: #5b8fa8; }
-
-/* Sekmeler */
-.sekmeler {
-  display: flex;
-  align-items: stretch;
-  gap: 0;
-}
-.sekme {
-  padding: 0 18px;
-  border: none;
-  background: none;
-  font-family: Arial, sans-serif;
-  font-size: 14px;
-  color: #777;
-  cursor: pointer;
-  border-bottom: 3px solid transparent;
-  transition: color 0.15s, border-color 0.15s;
-  white-space: nowrap;
-}
+.sekmeler { display: flex; align-items: stretch; }
+.sekme { padding: 0 18px; border: none; background: none; font-family: Arial, sans-serif; font-size: 14px; color: #777; cursor: pointer; border-bottom: 3px solid transparent; white-space: nowrap; }
 .sekme:hover { color: #333; background: #fafafa; }
 .sekme.aktif { color: #5b8fa8; border-bottom-color: #5b8fa8; font-weight: bold; }
+.header-sag { display: flex; align-items: center; gap: 8px; padding-left: 12px; }
 
-.header-sag {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding-left: 16px;
+/* Sync göstergesi */
+.sync-durum {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 12px; color: #aaa; white-space: nowrap;
 }
+.sync-nokta { width: 7px; height: 7px; border-radius: 50%; background: #ccc; flex-shrink: 0; }
+.sync-nokta.bagli { background: #2e7d51; }
+.sync-nokta.bekliyor { background: #e67e22; animation: pulse 1s infinite; }
+.sync-nokta.hata { background: #c0392b; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
 /* ── BUTONLAR ── */
-.btn {
-  padding: 7px 13px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  background: #fff;
-  color: #444;
-  font-size: 13px;
-  cursor: pointer;
-  font-family: Arial, sans-serif;
-  white-space: nowrap;
-}
+.btn { padding: 7px 13px; border: 1px solid #ccc; border-radius: 5px; background: #fff; color: #444; font-size: 13px; cursor: pointer; font-family: Arial, sans-serif; white-space: nowrap; }
 .btn:hover { background: #f0f0f0; }
 .btn-ana { background: #5b8fa8; color: #fff; border-color: #5b8fa8; }
 .btn-ana:hover { background: #4a7d96; }
@@ -77,55 +150,30 @@ body { font-family: Arial, sans-serif; background: #f7f7f7; color: #333; font-si
 .btn-kirmizi:hover { background: #a93226; }
 .btn-xs { padding: 4px 9px; font-size: 12px; border-radius: 4px; }
 
-/* ── SAYFA PANEL ── */
+/* ── PANEL ── */
 .panel { display: none; }
 .panel.aktif { display: flex; min-height: calc(100vh - 50px); }
 
-/* ── SOL MENU (stok paneli) ── */
-.menu {
-  width: 175px;
-  background: #fff;
-  border-right: 1px solid #ddd;
-  padding: 12px 0;
-  flex-shrink: 0;
-  overflow-y: auto;
-}
+/* ── SOL MENU ── */
+.menu { width: 175px; background: #fff; border-right: 1px solid #ddd; padding: 12px 0; flex-shrink: 0; overflow-y: auto; }
 .menu-grup { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #aaa; padding: 10px 14px 4px; }
-.menu-item {
-  display: flex; align-items: center; gap: 8px;
-  width: 100%; padding: 9px 14px;
-  border: none; background: none;
-  color: #555; font-size: 13px; cursor: pointer;
-  font-family: Arial, sans-serif; text-align: left;
-  border-left: 3px solid transparent;
-}
+.menu-item { display: flex; align-items: center; gap: 8px; width: 100%; padding: 9px 14px; border: none; background: none; color: #555; font-size: 13px; cursor: pointer; font-family: Arial, sans-serif; text-align: left; border-left: 3px solid transparent; }
 .menu-item:hover { background: #f5f5f5; color: #333; }
 .menu-item.aktif { background: #edf3f7; color: #5b8fa8; border-left-color: #5b8fa8; font-weight: bold; }
 .menu-nokta { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 .menu-cizgi { height: 1px; background: #eee; margin: 8px 14px; }
 
-/* ── İÇERİK (stok) ── */
+/* ── İÇERİK ── */
 .icerik { flex: 1; padding: 20px; overflow-x: auto; }
 
 /* Son değişiklik */
-.degisiklik-kutusu {
-  background: #fff;
-  border: 1px solid #ddd;
-  border-left: 4px solid #5b8fa8;
-  border-radius: 6px;
-  padding: 11px 15px;
-  margin-bottom: 14px;
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
-}
+.degisiklik-kutusu { background: #fff; border: 1px solid #ddd; border-left: 4px solid #5b8fa8; border-radius: 6px; padding: 11px 15px; margin-bottom: 14px; display: flex; align-items: flex-start; gap: 14px; }
 .degisiklik-bilgi { flex: 1; }
 .degisiklik-baslik { font-size: 10px; font-weight: bold; color: #aaa; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
 .degisiklik-zaman { font-size: 13px; font-weight: bold; color: #5b8fa8; margin-bottom: 2px; }
 .degisiklik-detay { font-size: 13px; color: #444; }
 .degisiklik-yok { font-size: 13px; color: #aaa; font-style: italic; }
 .gecmis-toggle { font-size: 12px; color: #5b8fa8; cursor: pointer; background: none; border: none; font-family: Arial, sans-serif; text-decoration: underline; white-space: nowrap; align-self: center; }
-
 .gecmis-panel { display: none; background: #f9f9f9; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 14px; overflow: hidden; }
 .gecmis-panel.acik { display: block; }
 .gecmis-baslik { background: #edf3f7; padding: 7px 13px; font-size: 12px; font-weight: bold; color: #5b8fa8; border-bottom: 1px solid #ddd; }
@@ -134,22 +182,10 @@ body { font-family: Arial, sans-serif; background: #f7f7f7; color: #333; font-si
 .gecmis-zaman { color: #999; flex-shrink: 0; width: 125px; }
 .gecmis-bos { padding: 10px 13px; font-size: 12px; color: #aaa; font-style: italic; }
 
-/* Yedek durumu */
-.yedek-satirbasi { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; font-size: 13px; color: #777; }
-.yedek-satirbasi strong { color: #444; }
-
 /* Üst bar */
 .ust-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
 .sayfa-baslik { font-size: 16px; font-weight: bold; color: #333; flex: 1; }
-.arama {
-  padding: 7px 11px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 13px;
-  width: 220px;
-  font-family: Arial, sans-serif;
-  color: #333;
-}
+.arama { padding: 7px 11px; border: 1px solid #ccc; border-radius: 5px; font-size: 13px; width: 220px; font-family: Arial, sans-serif; color: #333; }
 .arama:focus { outline: none; border-color: #5b8fa8; }
 .arama-ipucu { font-size: 11px; color: #aaa; }
 
@@ -163,96 +199,44 @@ tbody tr:hover td { background: #fafafa; }
 .bolum-satir td { background: #f0f4f7; color: #5b8fa8; font-weight: bold; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; padding: 7px 13px; border-bottom: 1px solid #dde6ec; }
 .modul-adi { color: #333; }
 .adet { font-weight: bold; font-size: 14px; }
-.adet-var   { color: #2e7d51; }
+.adet-var { color: #2e7d51; }
 .adet-sifir { color: #999; }
-.adet-yok   { color: #ccc; }
+.adet-yok { color: #ccc; }
 .not-hucre { color: #666; font-size: 12px; font-style: italic; }
-.not-bos   { color: #ddd; font-size: 12px; }
+.not-bos { color: #ddd; font-size: 12px; }
 .takim-badge { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 11px; font-weight: bold; color: #fff; }
 .eylem-grup { display: flex; gap: 4px; }
 .bos { text-align: center; padding: 32px; color: #aaa; font-size: 13px; }
 
-/* ── YÖNETİM PANELİ ── */
-.yonetim-panel {
-  flex: 1;
-  padding: 24px;
-  overflow-y: auto;
-}
-.yonetim-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-  gap: 20px;
-  max-width: 900px;
-}
-.yonetim-kart {
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  overflow: hidden;
-}
-.yonetim-kart-baslik {
-  background: #f0f4f7;
-  padding: 12px 16px;
-  font-size: 14px;
-  font-weight: bold;
-  color: #5b8fa8;
-  border-bottom: 1px solid #ddd;
-}
+/* ── YÖNETİM ── */
+.yonetim-panel { flex: 1; padding: 24px; overflow-y: auto; }
+.yonetim-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px; max-width: 900px; }
+.yonetim-kart { background: #fff; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; }
+.yonetim-kart-baslik { background: #f0f4f7; padding: 12px 16px; font-size: 14px; font-weight: bold; color: #5b8fa8; border-bottom: 1px solid #ddd; }
 .yonetim-kart-icerik { padding: 16px; }
-
-/* Takım listesi yönetim */
-.takim-satir {
-  display: flex; align-items: center; gap: 8px;
-  padding: 8px 0; border-bottom: 1px solid #f5f5f5;
-  font-size: 13px;
-}
+.takim-satir { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid #f5f5f5; font-size: 13px; }
 .takim-satir:last-child { border-bottom: none; }
 .takim-nokta { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
 .takim-ad { flex: 1; font-weight: 500; }
 .takim-adet { color: #aaa; font-size: 12px; margin-right: 6px; }
-
-/* Ürün sil listesi */
-.urun-sil-satir {
-  display: flex; align-items: center; gap: 8px;
-  padding: 8px 0; border-bottom: 1px solid #f5f5f5; font-size: 13px;
-}
+.urun-sil-satir { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid #f5f5f5; font-size: 13px; }
 .urun-sil-satir:last-child { border-bottom: none; }
-.urun-sil-satir:hover { background: #fff8f8; margin: 0 -16px; padding-left: 16px; padding-right: 16px; }
 .urun-sil-adi { flex: 1; }
 .urun-sil-depo { color: #aaa; font-size: 12px; margin-right: 4px; }
 .liste-kap { max-height: 280px; overflow-y: auto; }
+.form-alan { margin-bottom: 12px; }
+.form-alan label { display: block; font-size: 12px; font-weight: bold; color: #666; margin-bottom: 4px; }
+.form-alan input, .form-alan select, .form-alan textarea { width: 100%; padding: 8px 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 13px; font-family: Arial, sans-serif; color: #333; }
+.form-alan textarea { resize: vertical; min-height: 60px; }
+.form-alan input:focus, .form-alan select:focus, .form-alan textarea:focus { outline: none; border-color: #5b8fa8; }
 
 /* Sürükle-bırak */
-.siralama-satir {
-  display: flex; align-items: center; gap: 10px;
-  padding: 9px 12px;
-  background: #fff;
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: grab;
-  user-select: none;
-  transition: box-shadow 0.1s, border-color 0.1s;
-}
+.siralama-satir { display: flex; align-items: center; gap: 10px; padding: 9px 12px; background: #fff; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: grab; user-select: none; transition: box-shadow 0.1s, border-color 0.1s; }
 .siralama-satir:active { cursor: grabbing; }
 .siralama-satir.surukleniyor { opacity: 0.4; }
 .siralama-satir.uzerine-geldi { border-color: #5b8fa8; box-shadow: 0 0 0 2px rgba(91,143,168,0.2); }
 .siralama-tutac { color: #bbb; font-size: 18px; cursor: grab; flex-shrink: 0; line-height: 1; }
 .siralama-sira { font-size: 11px; color: #ccc; width: 16px; flex-shrink: 0; text-align: right; }
-
-/* Form elemanları */
-.form-alan { margin-bottom: 12px; }
-.form-alan label { display: block; font-size: 12px; font-weight: bold; color: #666; margin-bottom: 4px; }
-.form-alan input, .form-alan select, .form-alan textarea {
-  width: 100%; padding: 8px 10px;
-  border: 1px solid #ccc; border-radius: 5px;
-  font-size: 13px; font-family: Arial, sans-serif; color: #333;
-}
-.form-alan textarea { resize: vertical; min-height: 60px; }
-.form-alan input:focus, .form-alan select:focus, .form-alan textarea:focus { outline: none; border-color: #5b8fa8; }
-.form-satir { display: flex; gap: 8px; margin-top: 8px; }
-.form-satir .btn { flex-shrink: 0; }
 
 /* ── MODAL ── */
 .modal-arka { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 500; align-items: center; justify-content: center; }
@@ -263,7 +247,7 @@ tbody tr:hover td { background: #fafafa; }
 .modal-altbar { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
 
 /* BİLDİRİM */
-#bildirim { position: fixed; bottom: 20px; right: 20px; background: #2e7d51; color: #fff; padding: 11px 16px; border-radius: 6px; font-size: 13px; font-weight: bold; opacity: 0; transition: opacity 0.25s; z-index: 999; max-width: 280px; }
+#bildirim { position: fixed; bottom: 20px; right: 20px; background: #2e7d51; color: #fff; padding: 11px 16px; border-radius: 6px; font-size: 13px; font-weight: bold; opacity: 0; transition: opacity 0.25s; z-index: 999; max-width: 300px; }
 #bildirim.goster { opacity: 1; }
 #bildirim.hata { background: #c0392b; }
 
@@ -271,27 +255,95 @@ tbody tr:hover td { background: #fafafa; }
   .menu { display: none; }
   .arama { width: 150px; }
   .yonetim-grid { grid-template-columns: 1fr; }
+  .sync-durum span { display: none; }
 }
 </style>
 </head>
 <body>
 
+<!-- Sync animasyon çubuğu -->
+<div class="sync-bar" id="syncBar"></div>
+
+<!-- GİRİŞ EKRANI -->
+<div id="giris-ekrani">
+  <div class="giris-kutu">
+    <div class="giris-logo">ALMİLA <span>Stok</span></div>
+    <div class="giris-alt">Devam etmek için giriş yapın.</div>
+    <div class="giris-alan">
+      <label>E-posta</label>
+      <input type="email" id="giris-email" placeholder="ornek@mail.com" autocomplete="email"
+        oninput="this.classList.remove('hata');document.getElementById('giris-hata-mesaj').textContent=''">
+    </div>
+    <div class="giris-alan">
+      <label>Şifre</label>
+      <input type="password" id="giris-sifre" placeholder="••••••••" autocomplete="current-password"
+        oninput="this.classList.remove('hata');document.getElementById('giris-hata-mesaj').textContent=''">
+    </div>
+    <div class="giris-hata" id="giris-hata-mesaj"></div>
+    <button class="giris-btn" id="giris-btn" onclick="girisYap()">Giriş Yap</button>
+  </div>
+</div>
+
+<!-- Firebase Kurulum Ekranı -->
+<div id="kurulum-ekrani">
+  <div class="kurulum-kutu">
+    <h2>🔥 Firebase Bağlantısı Kur</h2>
+    <p class="alt">Bir kez yapılandırın — tüm cihazlarda otomatik senkronizasyon başlar.</p>
+
+    <div class="adim">
+      <div class="adim-no">1</div>
+      <div class="adim-icerik">
+        <a href="https://console.firebase.google.com" target="_blank" style="color:#5b8fa8">console.firebase.google.com</a> adresine gidin → <strong>Proje Ekle</strong> → projeye bir isim verin (örn: <code>almila-stok</code>) → Google Analytics'i kapatın → <strong>Proje Oluştur</strong>
+      </div>
+    </div>
+    <div class="adim">
+      <div class="adim-no">2</div>
+      <div class="adim-icerik">
+        Sol menüden <strong>Oluşturun → Realtime Database</strong> → <strong>Veritabanı Oluşturun</strong> → bölge olarak <strong>europe-west1</strong> seçin → <strong>Test modunda başlat</strong>
+      </div>
+    </div>
+    <div class="adim">
+      <div class="adim-no">3</div>
+      <div class="adim-icerik">
+        Sol menüden <strong>Proje Ayarları</strong> (dişli ikon) → <strong>Genel</strong> sekmesi → aşağı kaydırın → <strong>Uygulamalarınız</strong> bölümünde <code>&lt;/&gt;</code> (Web) tıklayın → uygulamaya isim verin → <strong>Kaydet</strong> → açılan konfigürasyon kodundaki değerleri aşağıya yapıştırın
+      </div>
+    </div>
+
+    <div class="kurulum-form">
+      <p style="font-size:13px;font-weight:bold;color:#444;margin-bottom:12px">Firebase Konfigürasyonu</p>
+      <label>API Key</label>
+      <input type="text" id="k-apiKey" placeholder="AIzaSy...">
+      <label>Auth Domain</label>
+      <input type="text" id="k-authDomain" placeholder="almila-stok.firebaseapp.com">
+      <label>Database URL</label>
+      <input type="text" id="k-dbUrl" placeholder="https://almila-stok-default-rtdb.europe-west1.firebasedatabase.app">
+      <label>Project ID</label>
+      <input type="text" id="k-projectId" placeholder="almila-stok">
+      <div class="kurulum-hata-mesaj" id="kurulum-hata"></div>
+      <button class="btn btn-ana" style="width:100%;margin-top:4px" onclick="firebaseKurulumKaydet()">Bağlan ve Başlat</button>
+    </div>
+  </div>
+</div>
+
 <!-- HEADER -->
-<div class="header">
+<div class="header" id="main-header" style="display:none">
   <div class="header-logo">ALMİLA <span>Stok</span></div>
   <div class="sekmeler">
     <button class="sekme aktif" id="sekme-stok" onclick="sekmeGec('stok')">📦 Stok Listesi</button>
     <button class="sekme" id="sekme-yonetim" onclick="sekmeGec('yonetim')">⚙ Yönetim</button>
   </div>
   <div class="header-sag">
+    <div class="sync-durum">
+      <div class="sync-nokta bekliyor" id="syncNokta"></div>
+      <span id="syncYazi">Bağlanıyor...</span>
+    </div>
     <button class="btn" onclick="excelIndir()">⬇ Excel</button>
-    <button class="btn btn-ana" onclick="yedekAl()">☁ Yedekle</button>
+    <button class="cikis-btn" onclick="cikisYap()" title="Çıkış Yap">⎋ Çıkış</button>
   </div>
 </div>
 
-<!-- ══ STOK PANELİ ══ -->
-<div class="panel aktif" id="panel-stok">
-
+<!-- STOK PANELİ -->
+<div class="panel aktif" id="panel-stok" style="display:none">
   <nav class="menu">
     <div class="menu-grup">Görünüm</div>
     <button class="menu-item aktif" id="mi-TÜMÜ" onclick="sec('TÜMÜ')">
@@ -309,32 +361,18 @@ tbody tr:hover td { background: #fafafa; }
       <span class="menu-nokta" style="background:#9b7fd4"></span>Halılar
     </button>
   </nav>
-
   <main class="icerik">
-
-    <!-- Son Değişiklik -->
     <div class="degisiklik-kutusu">
       <div class="degisiklik-bilgi">
         <div class="degisiklik-baslik">Son Yapılan Değişiklik</div>
-        <div id="sonDegisiklik" class="degisiklik-yok">Henüz hiç değişiklik yapılmadı.</div>
+        <div id="sonDegisiklik" class="degisiklik-yok">Yükleniyor...</div>
       </div>
       <button class="gecmis-toggle" onclick="gecmisToggle()">Geçmişi gör ▾</button>
     </div>
-
     <div class="gecmis-panel" id="gecmisPanel">
       <div class="gecmis-baslik">Değişiklik Geçmişi (son 20)</div>
       <div id="gecmisListesi"></div>
     </div>
-
-    <!-- Yedek durumu -->
-    <div class="yedek-satirbasi">
-      <strong>Yedek:</strong>
-      <span id="yedekDurum">—</span>
-      <span id="sonYedek" style="margin-left:auto;font-size:12px;color:#bbb"></span>
-      <button class="btn btn-xs" id="otoBtn" onclick="otoToggle()">⏱ Oto-Yedek: KAPALI</button>
-    </div>
-
-    <!-- Üst Bar -->
     <div class="ust-bar">
       <div class="sayfa-baslik" id="sayfaBaslik">Tüm Stok</div>
       <div style="display:flex;flex-direction:column;gap:2px">
@@ -342,113 +380,78 @@ tbody tr:hover td { background: #fafafa; }
         <span class="arama-ipucu">Takım adını da yazabilirsiniz (örn: BELLA, MONTE...)</span>
       </div>
     </div>
-
-    <!-- Tablo -->
     <div class="tablo-kap">
       <table>
         <thead id="tabloBaslik"></thead>
         <tbody id="tabloGovde"></tbody>
       </table>
     </div>
-
   </main>
 </div>
 
-<!-- ══ YÖNETİM PANELİ ══ -->
-<div class="panel" id="panel-yonetim">
+<!-- YÖNETİM PANELİ -->
+<div class="panel" id="panel-yonetim" style="display:none">
   <div class="yonetim-panel">
     <div class="yonetim-grid">
 
-      <!-- Takım ekle -->
       <div class="yonetim-kart">
         <div class="yonetim-kart-baslik">➕ Yeni Takım Ekle</div>
         <div class="yonetim-kart-icerik">
-          <div class="form-alan">
-            <label>Takım Adı</label>
-            <input type="text" id="yeniTakimAdi" placeholder="örn: LUNA">
-          </div>
+          <div class="form-alan"><label>Takım Adı</label><input type="text" id="yeniTakimAdi" placeholder="örn: LUNA"></div>
           <div class="form-alan">
             <label>Renk</label>
             <select id="yeniTakimRenk">
-              <option value="#5b8fa8">Mavi</option>
-              <option value="#c0737a">Gül</option>
-              <option value="#b56a42">Kahve</option>
-              <option value="#b58a3a">Sarı-Kahve</option>
-              <option value="#7a6fa8">Mor</option>
-              <option value="#4a8a7c">Yeşil</option>
-              <option value="#6a8f50">Açık Yeşil</option>
-              <option value="#5c7fa3">Koyu Mavi</option>
-              <option value="#b06080">Pembe</option>
-              <option value="#7a7a8a">Gri</option>
-              <option value="#4a8a9c">Teal</option>
-              <option value="#9a8a3a">Zeytin</option>
+              <option value="#5b8fa8">Mavi</option><option value="#c0737a">Gül</option>
+              <option value="#b56a42">Kahve</option><option value="#b58a3a">Sarı-Kahve</option>
+              <option value="#7a6fa8">Mor</option><option value="#4a8a7c">Yeşil</option>
+              <option value="#6a8f50">Açık Yeşil</option><option value="#5c7fa3">Koyu Mavi</option>
+              <option value="#b06080">Pembe</option><option value="#7a7a8a">Gri</option>
+              <option value="#4a8a9c">Teal</option><option value="#9a8a3a">Zeytin</option>
             </select>
           </div>
           <button class="btn btn-ana" onclick="takimEkle()" style="width:100%">Takımı Ekle</button>
         </div>
       </div>
 
-      <!-- Takım sil -->
       <div class="yonetim-kart">
         <div class="yonetim-kart-baslik">🗑 Takım Sil</div>
-        <div class="yonetim-kart-icerik">
-          <div class="liste-kap" id="takimSilListe"></div>
-        </div>
+        <div class="yonetim-kart-icerik"><div class="liste-kap" id="takimSilListe"></div></div>
       </div>
 
-      <!-- Ürün ekle -->
       <div class="yonetim-kart">
         <div class="yonetim-kart-baslik">➕ Yeni Ürün Ekle</div>
         <div class="yonetim-kart-icerik">
-          <div class="form-alan">
-            <label>Takım</label>
-            <select id="ueT"></select>
-          </div>
-          <div class="form-alan">
-            <label>Modül Adı</label>
-            <input type="text" id="ueM" placeholder="örn: 3 KAPAKLI DOLAP">
-          </div>
-          <div class="form-alan">
-            <label>Depo Adedi</label>
-            <input type="text" id="ueD" placeholder="örn: 2  (yoksa: -)">
-          </div>
-          <div class="form-alan">
-            <label>Not <span style="color:#aaa;font-weight:normal">(isteğe bağlı)</span></label>
-            <textarea id="ueN" placeholder="Not..."></textarea>
-          </div>
+          <div class="form-alan"><label>Takım</label><select id="ueT"></select></div>
+          <div class="form-alan"><label>Modül Adı</label><input type="text" id="ueM" placeholder="örn: 3 KAPAKLI DOLAP"></div>
+          <div class="form-alan"><label>Depo Adedi</label><input type="text" id="ueD" placeholder="örn: 2  (yoksa: -)"></div>
+          <div class="form-alan"><label>Not <span style="color:#aaa;font-weight:normal">(isteğe bağlı)</span></label><textarea id="ueN" placeholder="Not..."></textarea></div>
           <button class="btn btn-ana" onclick="urunEkleKaydet()" style="width:100%">Ürünü Ekle</button>
         </div>
       </div>
 
-      <!-- Ürün sil -->
       <div class="yonetim-kart">
         <div class="yonetim-kart-baslik">🗑 Ürün Sil</div>
         <div class="yonetim-kart-icerik">
-          <div class="form-alan">
-            <label>Takım Seç</label>
-            <select id="usT" onchange="urunSilListeGoster()"></select>
-          </div>
+          <div class="form-alan"><label>Takım Seç</label><select id="usT" onchange="urunSilListeGoster()"></select></div>
           <div class="liste-kap" id="urunSilListe"></div>
         </div>
       </div>
 
-      <!-- Takım sırası -->
-      <div class="yonetim-kart" style="grid-column: 1 / -1">
+      <div class="yonetim-kart" style="grid-column:1/-1">
         <div class="yonetim-kart-baslik">↕ Takım Sırasını Düzenle</div>
         <div class="yonetim-kart-icerik">
-          <p style="font-size:12px;color:#888;margin-bottom:10px">Takımları sürükleyerek istediğiniz sıraya getirin. Sol menü ve tablo bu sıraya göre güncellenir.</p>
+          <p style="font-size:12px;color:#888;margin-bottom:10px">Takımları sürükleyerek istediğiniz sıraya getirin.</p>
           <div id="siralama-listesi" style="display:flex;flex-direction:column;gap:4px"></div>
         </div>
       </div>
 
-      <!-- Yedek yönetimi -->
       <div class="yonetim-kart">
-        <div class="yonetim-kart-baslik">📁 Yedek Yönetimi</div>
+        <div class="yonetim-kart-baslik">🔥 Firebase Bağlantısı</div>
         <div class="yonetim-kart-icerik" style="display:flex;flex-direction:column;gap:10px">
-          <p style="font-size:13px;color:#666">Yedeği bilgisayara indirin, Google Drive'a yükleyin. Yedekten geri yüklemek için dosyayı seçin.</p>
-          <button class="btn btn-ana" onclick="yedekAl()">☁ Şimdi Yedekle (JSON İndir)</button>
-          <button class="btn" onclick="yedekYukle()">📂 Yedekten Geri Yükle</button>
-          <p style="font-size:12px;color:#aaa" id="yedekDurum2">—</p>
+          <p style="font-size:13px;color:#666">Tüm değişiklikler Firebase'e anlık olarak kaydedilir ve tüm cihazlara senkronize edilir.</p>
+          <div style="font-size:13px;color:#444"><b>Proje:</b> <span id="firebase-proje-adi" style="color:#5b8fa8">—</span></div>
+          <div style="font-size:13px;color:#444"><b>Durum:</b> <span id="firebase-durum-yazi">—</span></div>
+          <button class="btn btn-kirmizi" onclick="firebaseSifirla()" style="margin-top:4px">Bağlantıyı Sıfırla</button>
         </div>
       </div>
 
@@ -461,10 +464,7 @@ tbody tr:hover td { background: #fafafa; }
   <div class="modal">
     <h2>Depo Adedi Güncelle</h2>
     <p class="modal-alt" id="depoDuzAciklama"></p>
-    <div class="form-alan">
-      <label>Depo Adedi</label>
-      <input type="text" id="depoDuzInput" style="font-size:20px;font-weight:bold;text-align:center">
-    </div>
+    <div class="form-alan"><label>Depo Adedi</label><input type="text" id="depoDuzInput" style="font-size:20px;font-weight:bold;text-align:center"></div>
     <div class="modal-altbar">
       <button class="btn" onclick="modalKapat('depoDuzModal')">Vazgeç</button>
       <button class="btn btn-ana" onclick="depoDuzKaydet()">Kaydet</button>
@@ -477,10 +477,7 @@ tbody tr:hover td { background: #fafafa; }
   <div class="modal">
     <h2>Açıklama / Not</h2>
     <p class="modal-alt" id="notDuzAciklama"></p>
-    <div class="form-alan">
-      <label>Not</label>
-      <textarea id="notDuzInput" placeholder="Not yazın... (boş bırakırsanız silinir)"></textarea>
-    </div>
+    <div class="form-alan"><label>Not</label><textarea id="notDuzInput" placeholder="Not yazın... (boş bırakırsanız silinir)"></textarea></div>
     <div class="modal-altbar">
       <button class="btn" onclick="modalKapat('notDuzModal')">Vazgeç</button>
       <button class="btn btn-ana" onclick="notDuzKaydet()">Kaydet</button>
@@ -490,8 +487,15 @@ tbody tr:hover td { background: #fafafa; }
 
 <div id="bildirim"></div>
 
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+
 <script>
-// ── VERİ ──
+// ════════════════════════════════════════════
+// VERİ — Başlangıç stok verisi
+// ════════════════════════════════════════════
 let RENKLER = {
   'BELLA':'#c0737a','BİANCA':'#5b8fa8','ARWEN':'#b56a42','LAİLA':'#5c7fa3',
   'VENA':'#b58a3a','IRONY':'#7a6fa8','LEGEND':'#4a8a7c','LEGEND MOON':'#4a8a9c',
@@ -499,7 +503,7 @@ let RENKLER = {
   'NEO GRİ RANZA':'#888','NEO SARI RANZA':'#9a8a3a',
 };
 
-const BAŞ = {
+const BAŞ_VERİ = {
   'BELLA':[
     {m:'1 KAPAKLI DOLAP',d:'-',n:''},{m:'2 KAPAKLI DOLAP',d:'-',n:''},{m:'3 KAPAKLI DOLAP',d:'1',n:''},
     {m:'4 KAPAKLI DOLAP',d:'0',n:''},{m:'KÖŞE DOLAP',d:'-',n:''},{m:'SÜRGÜLÜ DOLAP',d:'-',n:''},
@@ -592,43 +596,182 @@ const BAŞ = {
   ],
 };
 
-let veri   = JSON.parse(JSON.stringify(BAŞ));
-let gecmis = [];
-let secilen = 'TÜMÜ';
-let gecmisAcik = false;
-let otoAktif = false, otoInterval = null;
-let duzTk = '', duzIdx = -1;
-let takimSirasi = [];
+// ════════════════════════════════════════════
+// FIREBASE
+// ════════════════════════════════════════════
+let db = null;
+let dbRef = null;
+let localYazma = false; // kendi yazdığımız değişikliği dinleyiciden ayırt et
 
-try {
-  const k = localStorage.getItem('almila_v6');
-  if (k) {
-    const p = JSON.parse(k);
-    veri = p.veri; gecmis = p.gecmis||[];
-    RENKLER = p.renkler||RENKLER;
-    takimSirasi = p.takimSirasi||[];
+function firebaseKonfig() {
+  const raw = localStorage.getItem('almila_firebase');
+  if (!raw) return null;
+  try { return JSON.parse(raw); } catch(e) { return null; }
+}
+
+function firebaseBaslat(konfig) {
+  try {
+    if (firebase.apps.length === 0) {
+      firebase.initializeApp(konfig);
+    }
+    db = firebase.database();
+    dbRef = db.ref('almila_stok');
+
+    // Auth durumu değişince tetiklenir — giriş/çıkış ana akış burada
+    firebase.auth().onAuthStateChanged(kullanici => {
+      if (kullanici) {
+        // Giriş yapıldı — giriş ekranını kapat, uygulamayı aç
+        document.getElementById('giris-ekrani').classList.remove('goster');
+        document.getElementById('main-header').style.display = 'flex';
+        document.getElementById('panel-stok').style.display = 'flex';
+        document.getElementById('panel-stok').classList.add('aktif');
+        document.getElementById('firebase-proje-adi').textContent = konfig.projectId;
+        document.getElementById('firebase-durum-yazi').textContent = '🟢 Bağlı';
+
+        // Bağlantı durumu izle
+        db.ref('.info/connected').on('value', snap => {
+          const bagli = snap.val() === true;
+          setSyncDurum(bagli ? 'bagli' : 'bekliyor', bagli ? 'Bağlı' : 'Bağlanıyor...');
+        });
+
+        // Gerçek zamanlı veri dinleyici
+        dbRef.on('value', snap => {
+          if (localYazma) return;
+          const data = snap.val();
+          if (!data) {
+            firebaseYaz({veri: JSON.parse(JSON.stringify(BAŞ_VERİ)), gecmis: [], renkler: RENKLER, takimSirasi: Object.keys(RENKLER)});
+            return;
+          }
+          veri        = data.veri        || JSON.parse(JSON.stringify(BAŞ_VERİ));
+          gecmis      = data.gecmis      || [];
+          RENKLER     = data.renkler     || RENKLER;
+          takimSirasi = data.takimSirasi || Object.keys(RENKLER);
+          sirasiSenkronize();
+          menuOlustur();
+          renderTablo();
+          sonDegisiklikGoster();
+          gecmisListesiGoster();
+          setSyncDurum('bagli', 'Senkronize');
+        });
+
+      } else {
+        // Çıkış yapıldı — uygulamayı kapat, giriş ekranını göster
+        dbRef.off(); // dinleyiciyi kapat
+        document.getElementById('giris-ekrani').classList.add('goster');
+        document.getElementById('main-header').style.display = 'none';
+        document.querySelectorAll('.panel').forEach(p => { p.classList.remove('aktif'); p.style.display = 'none'; });
+      }
+    });
+
+    return true;
+  } catch(e) {
+    console.error('Firebase hatası:', e);
+    return false;
   }
-} catch(e) {}
+}
+
+function firebaseYaz(data) {
+  if (!dbRef) return;
+  localYazma = true;
+  setSyncDurum('bekliyor', 'Kaydediliyor...');
+  dbRef.set(data)
+    .then(() => {
+      setSyncDurum('bagli', 'Kaydedildi ✓');
+      setTimeout(() => setSyncDurum('bagli', 'Senkronize'), 2000);
+    })
+    .catch(e => {
+      setSyncDurum('hata', 'Kayıt hatası!');
+      bildir('Firebase kayıt hatası! İnternet bağlantısını kontrol edin.', true);
+    })
+    .finally(() => { setTimeout(() => localYazma = false, 500); });
+}
+
+function tamVeriYaz() {
+  firebaseYaz({veri, gecmis, renkler: RENKLER, takimSirasi});
+}
+
+function setSyncDurum(tip, yazi) {
+  const nokta = document.getElementById('syncNokta');
+  const yaziel = document.getElementById('syncYazi');
+  const bar = document.getElementById('syncBar');
+  nokta.className = 'sync-nokta ' + tip;
+  if (yaziel) yaziel.textContent = yazi;
+  if (tip === 'bekliyor') bar.className = 'sync-bar yukleniyor';
+  else if (tip === 'hata') bar.className = 'sync-bar hata';
+  else { bar.className = 'sync-bar'; }
+}
+
+// ── Firebase kurulum formu ──
+function firebaseKurulumKaydet() {
+  const alanlar = ['k-apiKey','k-authDomain','k-dbUrl','k-projectId'];
+  let tumu_dolu = true;
+  alanlar.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el.value.trim()) { el.classList.add('hata'); tumu_dolu = false; }
+    else el.classList.remove('hata');
+  });
+  if (!tumu_dolu) {
+    document.getElementById('kurulum-hata').textContent = 'Lütfen tüm alanları doldurun.';
+    document.getElementById('kurulum-hata').classList.add('goster');
+    return;
+  }
+  const konfig = {
+    apiKey:      document.getElementById('k-apiKey').value.trim(),
+    authDomain:  document.getElementById('k-authDomain').value.trim(),
+    databaseURL: document.getElementById('k-dbUrl').value.trim(),
+    projectId:   document.getElementById('k-projectId').value.trim(),
+  };
+  localStorage.setItem('almila_firebase', JSON.stringify(konfig));
+  const ok = firebaseBaslat(konfig);
+  if (ok) {
+    document.getElementById('kurulum-ekrani').classList.remove('goster');
+    document.getElementById('giris-ekrani').classList.add('goster');
+    bildir('Firebase bağlandı! Giriş yapın.');
+  } else {
+    document.getElementById('kurulum-hata').textContent = 'Bağlantı kurulamadı. Bilgileri kontrol edin.';
+    document.getElementById('kurulum-hata').classList.add('goster');
+    localStorage.removeItem('almila_firebase');
+  }
+}
+
+function firebaseSifirla() {
+  if (!confirm('Firebase bağlantısı sıfırlanacak. Yeniden kurulum ekranı açılacak.')) return;
+  localStorage.removeItem('almila_firebase');
+  location.reload();
+}
+
+// ════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════
+let veri        = JSON.parse(JSON.stringify(BAŞ_VERİ));
+let gecmis      = [];
+let secilen     = 'TÜMÜ';
+let gecmisAcik  = false;
+let duzTk = '', duzIdx = -1;
+let takimSirasi = Object.keys(RENKLER);
+let surukleKaynagi = null;
 
 function sirasiSenkronize() {
   const mevcutlar = Object.keys(RENKLER);
   mevcutlar.forEach(t => { if (!takimSirasi.includes(t)) takimSirasi.push(t); });
   takimSirasi = takimSirasi.filter(t => RENKLER[t]);
 }
-sirasiSenkronize();
 
 function anaListesi() { return takimSirasi; }
 
-// ── SEKME ──
+// ════════════════════════════════════════════
+// SEKME & MENU
+// ════════════════════════════════════════════
 function sekmeGec(id) {
   document.querySelectorAll('.sekme').forEach(s => s.classList.remove('aktif'));
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('aktif'));
+  document.querySelectorAll('.panel').forEach(p => { p.classList.remove('aktif'); p.style.display = 'none'; });
   document.getElementById('sekme-' + id).classList.add('aktif');
-  document.getElementById('panel-' + id).classList.add('aktif');
+  const panel = document.getElementById('panel-' + id);
+  panel.style.display = 'flex';
+  panel.classList.add('aktif');
   if (id === 'yonetim') yonetimPanelDoldur();
 }
 
-// ── MENU ──
 function menuOlustur() {
   document.getElementById('takim-listesi').innerHTML = anaListesi().map(t => {
     const id = 'mi-' + t.replace(/ /g,'__');
@@ -636,6 +779,8 @@ function menuOlustur() {
       <span class="menu-nokta" style="background:${RENKLER[t]}"></span>${t}
     </button>`;
   }).join('');
+  const aktifBtn = document.getElementById('mi-' + secilen.replace(/ /g,'__'));
+  if (aktifBtn) aktifBtn.classList.add('aktif');
 }
 
 function sec(t) {
@@ -648,71 +793,48 @@ function sec(t) {
   renderTablo();
 }
 
-// ── ARAMA: modül adı VEYA takım adı ──
-// Tüm Stok görünümünde: takım adı eşleşirse o takımın tüm ürünleri gösterilir
-// Tek takım görünümünde: sadece modül adında arar
+// ════════════════════════════════════════════
+// TABLO & ARAMA
+// ════════════════════════════════════════════
+function adetSinif(v) {
+  if (!v || v === '-') return 'adet adet-yok';
+  const n = parseInt(v);
+  return (isNaN(n) || n > 0) ? 'adet adet-var' : 'adet adet-sifir';
+}
+
 function renderTablo() {
   const ara = (document.getElementById('aramaKutu').value || '').toLowerCase().trim();
   const bas = document.getElementById('tabloBaslik');
   const gov = document.getElementById('tabloGovde');
+  const takimAdlari = {'ESKİ':'Eski Modeller','HALI':'Halılar'};
 
   if (secilen === 'TÜMÜ') {
-    bas.innerHTML = `<tr>
-      <th style="width:110px">Takım</th>
-      <th>Modül</th>
-      <th style="width:85px">Depo</th>
-      <th>Not</th>
-      <th style="width:120px"></th>
-    </tr>`;
-
+    bas.innerHTML = `<tr><th style="width:110px">Takım</th><th>Modül</th><th style="width:85px">Depo</th><th>Not</th><th style="width:120px"></th></tr>`;
     let html = '';
-    const tumTakimlar = [...anaListesi(), 'ESKİ', 'HALI'];
-    const takimRenkleri = {...RENKLER, 'ESKİ':'#aaa', 'HALI':'#9b7fd4'};
-    const takimAdlari = {'ESKİ':'Eski Modeller','HALI':'Halılar'};
-
-    tumTakimlar.forEach(tk => {
-      if (!veri[tk] || !veri[tk].length) return;
-      const takimAdi = takimAdlari[tk] || tk;
-      // Takım adı aramaya uyuyorsa → tüm ürünleri göster
-      // Değilse → sadece modül adı uyuşanları göster
-      const takimEslesir = ara === '' || takimAdi.toLowerCase().includes(ara) || tk.toLowerCase().includes(ara);
-      const liste = takimEslesir
-        ? veri[tk]  // takım adı uyuşuyor, hepsini göster
-        : veri[tk].filter(r => r.m.toLowerCase().includes(ara));
-
+    [...anaListesi(),'ESKİ','HALI'].forEach(tk => {
+      if (!veri[tk]||!veri[tk].length) return;
+      const takimAdi = takimAdlari[tk]||tk;
+      const takimEslesir = ara===''||takimAdi.toLowerCase().includes(ara)||tk.toLowerCase().includes(ara);
+      const liste = takimEslesir ? veri[tk] : veri[tk].filter(r=>r.m.toLowerCase().includes(ara));
       if (!liste.length) return;
-      const renk = takimRenkleri[tk] || '#888';
+      const renk = RENKLER[tk]||(tk==='ESKİ'?'#aaa':'#9b7fd4');
       html += `<tr class="bolum-satir"><td colspan="5" style="border-left:3px solid ${renk}">● ${takimAdi}</td></tr>`;
-      liste.forEach(r => { html += satirYap(tk, r); });
+      liste.forEach(r => { html += satirYap(tk,r); });
     });
-
-    if (!html) html = `<tr><td colspan="5" class="bos">Sonuç bulunamadı.</td></tr>`;
-    gov.innerHTML = html;
-
+    gov.innerHTML = html || `<tr><td colspan="5" class="bos">Sonuç bulunamadı.</td></tr>`;
   } else {
-    // Tek takım görünümü — sadece modül adında ara
-    bas.innerHTML = `<tr>
-      <th>Modül</th>
-      <th style="width:100px">Depo</th>
-      <th>Not</th>
-      <th style="width:120px"></th>
-    </tr>`;
-    const liste = (veri[secilen]||[]).filter(r =>
-      ara === '' || r.m.toLowerCase().includes(ara)
-    );
-    gov.innerHTML = liste.map(r => satirYap(secilen, r)).join('')
-      || `<tr><td colspan="4" class="bos">Kayıt bulunamadı.</td></tr>`;
+    bas.innerHTML = `<tr><th>Modül</th><th style="width:100px">Depo</th><th>Not</th><th style="width:120px"></th></tr>`;
+    const liste = (veri[secilen]||[]).filter(r=>ara===''||r.m.toLowerCase().includes(ara));
+    gov.innerHTML = liste.map(r=>satirYap(secilen,r)).join('') || `<tr><td colspan="4" class="bos">Kayıt bulunamadı.</td></tr>`;
   }
 }
 
 function satirYap(tk, r) {
   const i = (veri[tk]||[]).indexOf(r);
-  const renk = RENKLER[tk] || (tk==='ESKİ'?'#aaa':'#9b7fd4');
-  const ds = r.d==='-'||!r.d ? 'adet adet-yok' : (parseInt(r.d)===0?'adet adet-sifir':'adet adet-var');
-  const not = r.n || '';
-  const tkTd = secilen === 'TÜMÜ'
-    ? `<td><span class="takim-badge" style="background:${renk}">${tk}</span></td>`
-    : '';
+  const renk = RENKLER[tk]||(tk==='ESKİ'?'#aaa':'#9b7fd4');
+  const ds = adetSinif(r.d);
+  const not = r.n||'';
+  const tkTd = secilen==='TÜMÜ' ? `<td><span class="takim-badge" style="background:${renk}">${tk}</span></td>` : '';
   return `<tr>
     ${tkTd}
     <td class="modul-adi">${r.m}</td>
@@ -725,108 +847,106 @@ function satirYap(tk, r) {
   </tr>`;
 }
 
-// ── DEPO ──
-function depoDuzAc(tk, i) {
+// ════════════════════════════════════════════
+// DEPO & NOT DÜZENLEME
+// ════════════════════════════════════════════
+function depoDuzAc(tk,i) {
   duzTk=tk; duzIdx=i;
-  document.getElementById('depoDuzAciklama').textContent = tk + ' › ' + veri[tk][i].m;
+  document.getElementById('depoDuzAciklama').textContent = tk+' › '+veri[tk][i].m;
   document.getElementById('depoDuzInput').value = veri[tk][i].d;
   document.getElementById('depoDuzModal').classList.add('acik');
   setTimeout(()=>document.getElementById('depoDuzInput').select(),50);
 }
 function depoDuzKaydet() {
   const yeni = document.getElementById('depoDuzInput').value.trim();
-  if (!yeni) { bildir('Bir değer girin!', true); return; }
+  if (!yeni) { bildir('Bir değer girin!',true); return; }
   const eski = veri[duzTk][duzIdx].d;
   veri[duzTk][duzIdx].d = yeni;
   logEkle(duzTk, veri[duzTk][duzIdx].m, `Depo: "${eski}" → "${yeni}"`);
-  modalKapat('depoDuzModal'); renderTablo(); bildir('Güncellendi.');
+  modalKapat('depoDuzModal'); renderTablo();
 }
 
-// ── NOT ──
-function notDuzAc(tk, i) {
+function notDuzAc(tk,i) {
   duzTk=tk; duzIdx=i;
-  document.getElementById('notDuzAciklama').textContent = tk + ' › ' + veri[tk][i].m;
-  document.getElementById('notDuzInput').value = veri[tk][i].n || '';
+  document.getElementById('notDuzAciklama').textContent = tk+' › '+veri[tk][i].m;
+  document.getElementById('notDuzInput').value = veri[tk][i].n||'';
   document.getElementById('notDuzModal').classList.add('acik');
   setTimeout(()=>document.getElementById('notDuzInput').focus(),50);
 }
 function notDuzKaydet() {
   const yeni = document.getElementById('notDuzInput').value.trim();
-  const eski = veri[duzTk][duzIdx].n || '';
   veri[duzTk][duzIdx].n = yeni;
-  logEkle(duzTk, veri[duzTk][duzIdx].m, yeni ? `Not: "${yeni}"` : 'Not silindi');
-  modalKapat('notDuzModal'); renderTablo(); bildir('Not güncellendi.');
+  logEkle(duzTk, veri[duzTk][duzIdx].m, yeni?`Not: "${yeni}"`:'Not silindi');
+  modalKapat('notDuzModal'); renderTablo();
 }
 
-// ── LOG ──
+// ════════════════════════════════════════════
+// DEĞİŞİKLİK LOGU
+// ════════════════════════════════════════════
 function logEkle(takim, modul, ne) {
   const now = new Date();
-  const zaman = now.toLocaleDateString('tr-TR') + ' ' + now.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
+  const zaman = now.toLocaleDateString('tr-TR')+' '+now.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
   gecmis.unshift({zaman,takim,modul,ne});
-  if (gecmis.length > 20) gecmis.pop();
-  kaydet(); sonDegisiklikGoster(); gecmisListesiGoster();
+  if (gecmis.length>20) gecmis.pop();
+  tamVeriYaz();
+  sonDegisiklikGoster();
+  gecmisListesiGoster();
 }
+
 function sonDegisiklikGoster() {
   const el = document.getElementById('sonDegisiklik');
   if (!gecmis.length) { el.className='degisiklik-yok'; el.textContent='Henüz hiç değişiklik yapılmadı.'; return; }
-  const g = gecmis[0];
+  const g=gecmis[0];
   el.className='';
   el.innerHTML=`<div class="degisiklik-zaman">${g.zaman}</div><div class="degisiklik-detay"><b>${g.takim}</b> › ${g.modul} — ${g.ne}</div>`;
 }
 function gecmisListesiGoster() {
-  const el = document.getElementById('gecmisListesi');
+  const el=document.getElementById('gecmisListesi');
   if (!gecmis.length) { el.innerHTML='<div class="gecmis-bos">Henüz değişiklik yok.</div>'; return; }
-  el.innerHTML = gecmis.map(g=>`<div class="gecmis-satir"><span class="gecmis-zaman">${g.zaman}</span><span><b>${g.takim}</b> › ${g.modul} — ${g.ne}</span></div>`).join('');
+  el.innerHTML=gecmis.map(g=>`<div class="gecmis-satir"><span class="gecmis-zaman">${g.zaman}</span><span><b>${g.takim}</b> › ${g.modul} — ${g.ne}</span></div>`).join('');
 }
 function gecmisToggle() {
   gecmisAcik=!gecmisAcik;
   document.getElementById('gecmisPanel').classList.toggle('acik',gecmisAcik);
-  document.querySelector('.gecmis-toggle').textContent = gecmisAcik?'Geçmişi kapat ▴':'Geçmişi gör ▾';
+  document.querySelector('.gecmis-toggle').textContent=gecmisAcik?'Geçmişi kapat ▴':'Geçmişi gör ▾';
 }
 
-// ── YÖNETİM PANELİ ──
+// ════════════════════════════════════════════
+// YÖNETİM PANELİ
+// ════════════════════════════════════════════
 function yonetimPanelDoldur() {
-  // Takım sil listesi
-  const tsl = document.getElementById('takimSilListe');
-  tsl.innerHTML = anaListesi().map(t =>
+  document.getElementById('takimSilListe').innerHTML = anaListesi().map(t=>
     `<div class="takim-satir">
       <span class="takim-nokta" style="background:${RENKLER[t]}"></span>
       <span class="takim-ad">${t}</span>
       <span class="takim-adet">${(veri[t]||[]).length} ürün</span>
       <button class="btn btn-kirmizi btn-xs" onclick="takimSil('${t}')">Sil</button>
     </div>`
-  ).join('') || '<p style="font-size:13px;color:#aaa;padding:8px 0">Takım yok.</p>';
+  ).join('')||'<p style="font-size:13px;color:#aaa">Takım yok.</p>';
 
-  // Ürün ekle takım seçimi
-  const hepsi = [...anaListesi(),'ESKİ','HALI'];
-  document.getElementById('ueT').innerHTML = hepsi.map(t=>`<option value="${t}">${t}</option>`).join('');
-
-  // Ürün sil takım seçimi
-  document.getElementById('usT').innerHTML = hepsi.map(t=>`<option value="${t}">${t}</option>`).join('');
+  const hepsi=[...anaListesi(),'ESKİ','HALI'];
+  document.getElementById('ueT').innerHTML=hepsi.map(t=>`<option value="${t}">${t}</option>`).join('');
+  document.getElementById('usT').innerHTML=hepsi.map(t=>`<option value="${t}">${t}</option>`).join('');
   urunSilListeGoster();
-
-  // Sıralama listesi
   siralama_goster();
 }
 
 function takimSil(t) {
-  const s = (veri[t]||[]).length;
-  if (!confirm('"'+t+'" takımını silmek istiyor musunuz?\n('+s+' ürün kaydı da silinecek)')) return;
+  if (!confirm('"'+t+'" takımını silmek istiyor musunuz?\n('+(veri[t]||[]).length+' ürün kaydı da silinecek)')) return;
   delete RENKLER[t]; delete veri[t];
-  takimSirasi = takimSirasi.filter(x => x !== t);
-  kaydet(); menuOlustur(); yonetimPanelDoldur();
+  takimSirasi=takimSirasi.filter(x=>x!==t);
+  tamVeriYaz(); menuOlustur(); yonetimPanelDoldur();
   if (secilen===t) sec('TÜMÜ'); else renderTablo();
   bildir(t+' takımı silindi.');
 }
 
 function takimEkle() {
-  const ad = document.getElementById('yeniTakimAdi').value.trim().toUpperCase();
-  const renk = document.getElementById('yeniTakimRenk').value;
+  const ad=document.getElementById('yeniTakimAdi').value.trim().toUpperCase();
+  const renk=document.getElementById('yeniTakimRenk').value;
   if (!ad) { bildir('Takım adı yazın!',true); return; }
   if (RENKLER[ad]) { bildir('Bu takım zaten var!',true); return; }
-  RENKLER[ad]=renk; veri[ad]=[];
-  takimSirasi.push(ad);
-  kaydet(); menuOlustur(); yonetimPanelDoldur();
+  RENKLER[ad]=renk; veri[ad]=[]; takimSirasi.push(ad);
+  tamVeriYaz(); menuOlustur(); yonetimPanelDoldur();
   document.getElementById('yeniTakimAdi').value='';
   bildir(ad+' takımı eklendi.');
 }
@@ -840,29 +960,25 @@ function urunEkleKaydet() {
   if (!veri[tk]) veri[tk]=[];
   veri[tk].push({m,d,n});
   logEkle(tk,m,'Yeni ürün eklendi (Depo: '+d+')');
-  document.getElementById('ueM').value='';
-  document.getElementById('ueD').value='';
-  document.getElementById('ueN').value='';
+  ['ueM','ueD','ueN'].forEach(id=>document.getElementById(id).value='');
   if (secilen===tk||secilen==='TÜMÜ') renderTablo();
   bildir(tk+' takımına "'+m+'" eklendi.');
 }
 
 function urunSilListeGoster() {
-  const tk = document.getElementById('usT').value;
-  const liste = veri[tk]||[];
-  const el = document.getElementById('urunSilListe');
+  const tk=document.getElementById('usT').value;
+  const liste=veri[tk]||[];
+  const el=document.getElementById('urunSilListe');
   if (!liste.length) { el.innerHTML='<p style="font-size:13px;color:#aaa;padding:8px 0">Bu takımda kayıt yok.</p>'; return; }
-  el.innerHTML = liste.map((r,i)=>
-    `<div class="urun-sil-satir">
-      <span class="urun-sil-adi">${r.m}</span>
-      <span class="urun-sil-depo">${r.d}</span>
-      <button class="btn btn-kirmizi btn-xs" onclick="urunSilOnay('${tk}',${i})">Sil</button>
-    </div>`
-  ).join('');
+  el.innerHTML=liste.map((r,i)=>`<div class="urun-sil-satir">
+    <span class="urun-sil-adi">${r.m}</span>
+    <span class="urun-sil-depo">${r.d}</span>
+    <button class="btn btn-kirmizi btn-xs" onclick="urunSilOnay('${tk}',${i})">Sil</button>
+  </div>`).join('');
 }
 
-function urunSilOnay(tk, i) {
-  const m = veri[tk][i].m;
+function urunSilOnay(tk,i) {
+  const m=veri[tk][i].m;
   if (!confirm('"'+m+'" silinsin mi?')) return;
   veri[tk].splice(i,1);
   logEkle(tk,m,'Ürün silindi');
@@ -871,20 +987,18 @@ function urunSilOnay(tk, i) {
   bildir('Silindi.');
 }
 
-// ── SIRALAMA SÜRÜKLE-BIRAK ──
-let surukleKaynagi = null;
-
+// ════════════════════════════════════════════
+// SIRALAMA SÜRÜKLE-BIRAK
+// ════════════════════════════════════════════
 function siralama_goster() {
-  const el = document.getElementById('siralama-listesi');
+  const el=document.getElementById('siralama-listesi');
   if (!el) return;
-  el.innerHTML = takimSirasi.map((t, i) => `
-    <div class="siralama-satir"
-      draggable="true"
-      data-takim="${t}"
-      ondragstart="siralama_baslat(event, '${t}')"
+  el.innerHTML=anaListesi().map((t,i)=>`
+    <div class="siralama-satir" draggable="true" data-takim="${t}"
+      ondragstart="siralama_baslat(event,'${t}')"
       ondragover="siralama_uzerinde(event)"
-      ondrop="siralama_birak(event, '${t}')"
-      ondragend="siralama_bitti(event)">
+      ondrop="siralama_birak(event,'${t}')"
+      ondragend="siralama_bitti()">
       <span class="siralama-tutac">⠿</span>
       <span class="siralama-sira">${i+1}</span>
       <span class="menu-nokta" style="background:${RENKLER[t]}"></span>
@@ -893,43 +1007,36 @@ function siralama_goster() {
     </div>`).join('');
 }
 
-function siralama_baslat(e, t) {
-  surukleKaynagi = t;
+function siralama_baslat(e,t) {
+  surukleKaynagi=t;
   e.currentTarget.classList.add('surukleniyor');
-  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.effectAllowed='move';
 }
-
 function siralama_uzerinde(e) {
   e.preventDefault();
-  e.dataTransfer.dropEffect = 'move';
-  document.querySelectorAll('.siralama-satir').forEach(el => el.classList.remove('uzerine-geldi'));
+  e.dataTransfer.dropEffect='move';
+  document.querySelectorAll('.siralama-satir').forEach(el=>el.classList.remove('uzerine-geldi'));
   e.currentTarget.classList.add('uzerine-geldi');
 }
-
-function siralama_birak(e, hedef) {
+function siralama_birak(e,hedef) {
   e.preventDefault();
-  if (!surukleKaynagi || surukleKaynagi === hedef) return;
-  const kaynakIdx = takimSirasi.indexOf(surukleKaynagi);
-  const hedefIdx  = takimSirasi.indexOf(hedef);
-  takimSirasi.splice(kaynakIdx, 1);
-  takimSirasi.splice(hedefIdx, 0, surukleKaynagi);
-  kaydet(); menuOlustur(); siralama_goster();
-  if (secilen === 'TÜMÜ') renderTablo();
+  if (!surukleKaynagi||surukleKaynagi===hedef) return;
+  const ki=takimSirasi.indexOf(surukleKaynagi), hi=takimSirasi.indexOf(hedef);
+  takimSirasi.splice(ki,1); takimSirasi.splice(hi,0,surukleKaynagi);
+  tamVeriYaz(); menuOlustur(); siralama_goster();
+  if (secilen==='TÜMÜ') renderTablo();
   bildir('Sıra güncellendi.');
 }
-
-function siralama_bitti(e) {
-  surukleKaynagi = null;
-  document.querySelectorAll('.siralama-satir').forEach(el => {
-    el.classList.remove('surukleniyor');
-    el.classList.remove('uzerine-geldi');
+function siralama_bitti() {
+  surukleKaynagi=null;
+  document.querySelectorAll('.siralama-satir').forEach(el=>{
+    el.classList.remove('surukleniyor','uzerine-geldi');
   });
 }
 
-// ── KAYDET ──
-function kaydet() { localStorage.setItem('almila_v6',JSON.stringify({veri,gecmis,renkler:RENKLER,takimSirasi})); }
-
-// ── EXCEL ──
+// ════════════════════════════════════════════
+// EXCEL
+// ════════════════════════════════════════════
 function excelIndir() {
   let csv='\uFEFF'+'TAKıM,MODÜL,DEPO ADEDİ,NOT\n';
   [...anaListesi(),'ESKİ','HALI'].forEach(tk=>
@@ -941,74 +1048,88 @@ function excelIndir() {
   a.click(); bildir('Excel indirildi.');
 }
 
-// ── YEDEK ──
-function yedekAl() {
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob(
-    [JSON.stringify({tarih:new Date().toISOString(),veri,gecmis,renkler:RENKLER},null,2)],
-    {type:'application/json'}
-  ));
-  a.download='almila_yedek_'+new Date().toISOString().slice(0,16).replace('T','_').replace(':','-')+'.json';
-  a.click();
-  const z=new Date().toLocaleString('tr-TR');
-  document.getElementById('sonYedek').textContent='Son yedek: '+z;
-  document.getElementById('yedekDurum').textContent="İndirildi — Drive'a yükleyin";
-  document.getElementById('yedekDurum2').textContent="Son yedek: "+z;
-  bildir("Yedek alındı. Drive'a yükleyin.");
-}
+// ════════════════════════════════════════════
+// GİRİŞ / ÇIKIŞ
+// ════════════════════════════════════════════
+function girisYap() {
+  const email  = document.getElementById('giris-email').value.trim();
+  const sifre  = document.getElementById('giris-sifre').value;
+  const hataEl = document.getElementById('giris-hata-mesaj');
+  const btn    = document.getElementById('giris-btn');
 
-function yedekYukle() {
-  const inp=document.createElement('input'); inp.type='file'; inp.accept='.json';
-  inp.onchange=e=>{
-    const f=e.target.files[0]; if(!f)return;
-    const r=new FileReader();
-    r.onload=ev=>{
-      try {
-        const p=JSON.parse(ev.target.result);
-        if (!p.veri){bildir('Geçersiz dosya!',true);return;}
-        const t=p.tarih?new Date(p.tarih).toLocaleString('tr-TR'):'?';
-        if(confirm(t+' tarihli yedek yüklensin mi?')){
-          veri=p.veri; gecmis=p.gecmis||[]; if(p.renkler)RENKLER=p.renkler;
-          if(p.takimSirasi) takimSirasi=p.takimSirasi; sirasiSenkronize();
-          kaydet(); menuOlustur(); renderTablo(); sonDegisiklikGoster(); gecmisListesiGoster();
-          bildir('Yedekten yüklendi.');
-        }
-      } catch(e){bildir('Dosya okunamadı!',true);}
-    }; r.readAsText(f);
-  }; inp.click();
-}
-
-function otoToggle() {
-  otoAktif=!otoAktif;
-  const btn=document.getElementById('otoBtn');
-  if(otoAktif){
-    btn.textContent='⏱ Oto-Yedek: AÇIK'; btn.style.background='#4a8a7c'; btn.style.color='#fff'; btn.style.borderColor='#4a8a7c';
-    otoInterval=setInterval(yedekAl,30*60*1000); bildir('Otomatik yedek açıldı (30 dk).');
-  } else {
-    btn.textContent='⏱ Oto-Yedek: KAPALI'; btn.style.background=''; btn.style.color=''; btn.style.borderColor='';
-    clearInterval(otoInterval); bildir('Otomatik yedek kapatıldı.');
+  if (!email || !sifre) {
+    hataEl.textContent = 'E-posta ve şifrenizi girin.';
+    return;
   }
+
+  btn.disabled = true;
+  btn.textContent = 'Giriş yapılıyor...';
+  hataEl.textContent = '';
+
+  firebase.auth().signInWithEmailAndPassword(email, sifre)
+    .then(() => {
+      // onAuthStateChanged devralır — uygulamayı açar
+      document.getElementById('giris-sifre').value = '';
+    })
+    .catch(err => {
+      btn.disabled = false;
+      btn.textContent = 'Giriş Yap';
+      const mesajlar = {
+        'auth/invalid-credential':    'E-posta veya şifre hatalı.',
+        'auth/user-not-found':        'Bu e-posta ile kayıtlı kullanıcı yok.',
+        'auth/wrong-password':        'Şifre hatalı.',
+        'auth/invalid-email':         'Geçersiz e-posta adresi.',
+        'auth/too-many-requests':     'Çok fazla hatalı deneme. Lütfen biraz bekleyin.',
+        'auth/network-request-failed':'İnternet bağlantısı yok.',
+      };
+      hataEl.textContent = mesajlar[err.code] || 'Giriş başarısız: ' + err.message;
+      document.getElementById('giris-email').classList.add('hata');
+      document.getElementById('giris-sifre').classList.add('hata');
+    });
 }
 
-// ── BİLDİRİM ──
-function bildir(msg,hata=false){
+function cikisYap() {
+  if (!confirm('Çıkış yapmak istiyor musunuz?')) return;
+  firebase.auth().signOut();
+  // onAuthStateChanged devralır — giriş ekranını gösterir
+}
+
+// ════════════════════════════════════════════
+// MODAL & BİLDİRİM
+// ════════════════════════════════════════════
+function modalKapat(id) { document.getElementById(id).classList.remove('acik'); }
+['depoDuzModal','notDuzModal'].forEach(id=>{
+  document.getElementById(id).addEventListener('click',function(e){if(e.target===this)modalKapat(id);});
+});
+document.getElementById('depoDuzInput').addEventListener('keydown',e=>{if(e.key==='Enter')depoDuzKaydet();});
+document.getElementById('giris-sifre').addEventListener('keydown',e=>{if(e.key==='Enter')girisYap();});
+document.getElementById('giris-email').addEventListener('keydown',e=>{
+  if(e.key==='Enter') document.getElementById('giris-sifre').focus();
+});
+
+function bildir(msg,hata=false) {
   const el=document.getElementById('bildirim');
   el.textContent=msg; el.style.background=hata?'#c0392b':'#2e7d51';
   el.className='goster'; clearTimeout(el._t); el._t=setTimeout(()=>el.className='',3200);
 }
 
-// Modal kapat
-function modalKapat(id){document.getElementById(id).classList.remove('acik');}
-['depoDuzModal','notDuzModal'].forEach(id=>{
-  document.getElementById(id).addEventListener('click',function(e){if(e.target===this)modalKapat(id);});
-});
-document.getElementById('depoDuzInput').addEventListener('keydown',e=>{if(e.key==='Enter')depoDuzKaydet();});
-
-// ── BAŞLAT ──
-menuOlustur();
-renderTablo();
-sonDegisiklikGoster();
-gecmisListesiGoster();
+// ════════════════════════════════════════════
+// BAŞLAT
+// ════════════════════════════════════════════
+const kaydKonfig = firebaseKonfig();
+if (kaydKonfig) {
+  // Firebase daha önce kuruldu — başlat, auth akışı giriş ekranını yönetir
+  const ok = firebaseBaslat(kaydKonfig);
+  if (!ok) {
+    // Bağlantı kurulamadıysa kurulum ekranına dön
+    localStorage.removeItem('almila_firebase');
+    document.getElementById('kurulum-ekrani').classList.add('goster');
+  }
+  // ok ise: onAuthStateChanged devralır — giriş yapılmışsa direkt açar, yapılmamışsa giriş ekranı gösterir
+} else {
+  // İlk kez açılıyor — kurulum ekranını göster
+  document.getElementById('kurulum-ekrani').classList.add('goster');
+}
 </script>
 </body>
 </html>
