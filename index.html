@@ -1196,26 +1196,25 @@ document.addEventListener('DOMContentLoaded', function() {
       jsonImportData = null;
       try {
         const parsed = JSON.parse(ev.target.result);
-        // Firebase formatı: {veri:{...}, gecmis:[...], ...} veya doğrudan {BELLA:[...], ...}
-        const veriObj = parsed.veri || parsed;
-        if (typeof veriObj !== 'object' || Array.isArray(veriObj)) throw new Error('Geçersiz format');
-        // Önizleme: kaç takım, kaç ürün güncellenecek
-        let guncellenecek = 0, bulunan = 0, bulunamayan = [];
-        Object.keys(veriObj).forEach(takim => {
-          const mevcutTakim = veri[takim];
-          if (!mevcutTakim) { bulunamayan.push(takim); return; }
-          (veriObj[takim] || []).forEach(yeniUrun => {
-            const mevcutUrun = mevcutTakim.find(u => u.m === yeniUrun.m);
-            if (mevcutUrun) {
-              if (mevcutUrun.d !== yeniUrun.d || mevcutUrun.n !== yeniUrun.n) guncellenecek++;
-              bulunan++;
-            }
-          });
-        });
-        jsonImportData = veriObj;
-        let html = `<b style="color:#2e7d51">✓ Dosya okundu</b><br><br>`;
-        html += `<b>${bulunan}</b> eşleşen ürün bulundu, <b>${guncellenecek}</b> tanesi güncelleme gerektirecek.<br>`;
-        if (bulunamayan.length) html += `<br><span style="color:#e67e22">⚠ Mevcut veride bulunmayan takımlar (atlanacak): ${bulunamayan.join(', ')}</span>`;
+        if (typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error('Geçersiz format');
+
+        // Hem {veri:{...}, renkler:{...}, ...} formatını hem de düz {TAKIM:[...]} formatını destekle
+        const yeniVeri    = parsed.veri    || parsed;
+        const yeniRenkler = parsed.renkler || null;
+        const yeniSira    = parsed.takimSirasi || (yeniRenkler ? Object.keys(yeniRenkler) : null);
+
+        if (typeof yeniVeri !== 'object' || Array.isArray(yeniVeri)) throw new Error('Geçersiz veri formatı');
+
+        // Önizleme istatistikleri
+        const anaTabimlar = Object.keys(yeniVeri).filter(t => t !== 'ESKİ' && t !== 'HALI');
+        let toplamUrun = 0;
+        Object.keys(yeniVeri).forEach(t => { toplamUrun += (yeniVeri[t]||[]).length; });
+
+        jsonImportData = { veri: yeniVeri, renkler: yeniRenkler, takimSirasi: yeniSira };
+
+        let html = `<b style="color:#2e7d51">✓ Dosya okundu — TAM YÜKLEME yapılacak</b><br><br>`;
+        html += `<b>${anaTabimlar.length}</b> takım, <b>${toplamUrun}</b> ürün JSON'dan yüklenecek.<br>`;
+        html += `<br><span style="color:#c0392b">⚠ Mevcut tüm veri, takımlar ve ürünler JSON ile TAM OLARAK değiştirilecek.</span>`;
         onizEl.innerHTML = html;
         onizEl.style.display = 'block';
         document.getElementById('jsonImportUygula').disabled = false;
@@ -1230,24 +1229,53 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function jsonImportUygula() {
   if (!jsonImportData) return;
-  let toplam = 0;
-  Object.keys(jsonImportData).forEach(takim => {
-    if (!veri[takim]) return;
-    (jsonImportData[takim] || []).forEach(yeniUrun => {
-      const mevcutUrun = veri[takim].find(u => u.m === yeniUrun.m);
-      if (mevcutUrun) {
-        const eskiD = mevcutUrun.d, eskiN = mevcutUrun.n;
-        mevcutUrun.d = yeniUrun.d !== undefined ? yeniUrun.d : mevcutUrun.d;
-        mevcutUrun.n = yeniUrun.n !== undefined ? yeniUrun.n : mevcutUrun.n;
-        if (mevcutUrun.d !== eskiD || mevcutUrun.n !== eskiN) toplam++;
-      }
+  if (!confirm('Tüm mevcut veri JSON dosyasıyla TAM OLARAK değiştirilecek. Emin misiniz?')) return;
+
+  const { veri: yeniVeri, renkler: yeniRenkler, takimSirasi: yeniSira } = jsonImportData;
+
+  // Veriyi tamamen yeni JSON ile değiştir
+  veri = JSON.parse(JSON.stringify(yeniVeri));
+
+  // Renkleri güncelle — JSON'da varsa kullan, yoksa mevcut renkleri koru + yeni takımlara varsayılan ata
+  if (yeniRenkler) {
+    RENKLER = JSON.parse(JSON.stringify(yeniRenkler));
+  } else {
+    // Renk bilgisi yoksa: yeni takımlara varsayılan renk ata
+    const varsayilanRenkler = ['#5b8fa8','#c0737a','#b56a42','#b58a3a','#7a6fa8','#4a8a7c','#6a8f50','#5c7fa3','#b06080','#7a7a8a','#4a8a9c','#9a8a3a'];
+    let renkSayac = 0;
+    Object.keys(yeniVeri).filter(t => t !== 'ESKİ' && t !== 'HALI').forEach(t => {
+      if (!RENKLER[t]) RENKLER[t] = varsayilanRenkler[renkSayac++ % varsayilanRenkler.length];
     });
-  });
-  if (toplam === 0) { bildir('Değiştirilecek kayıt bulunamadı.', true); return; }
-  logEkle('SİSTEM', 'JSON İmport', toplam + ' ürün güncellendi');
+    // Artık olmayan takımları temizle
+    Object.keys(RENKLER).forEach(t => {
+      if (!yeniVeri[t]) delete RENKLER[t];
+    });
+  }
+
+  // Takım sırasını güncelle
+  if (yeniSira && Array.isArray(yeniSira)) {
+    takimSirasi = yeniSira.filter(t => RENKLER[t]);
+  } else {
+    takimSirasi = Object.keys(RENKLER);
+  }
+  sirasiSenkronize();
+
+  // Firebase'e yaz
+  const now = new Date();
+  const zaman = now.toLocaleDateString('tr-TR')+' '+now.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
+  gecmis.unshift({zaman, takim:'SİSTEM', modul:'JSON İmport', ne:'Tüm veri JSON dosyasından yüklendi'});
+  if (gecmis.length > 20) gecmis.pop();
+  tamVeriYaz();
+
+  // Arayüzü güncelle
+  menuOlustur();
   renderTablo();
+  sonDegisiklikGoster();
+  gecmisListesiGoster();
+  if (document.getElementById('panel-yonetim').classList.contains('aktif')) yonetimPanelDoldur();
+
   modalKapat('jsonImportModal');
-  bildir(toplam + ' ürün JSON\'dan güncellendi ✓');
+  bildir('JSON tam yüklendi ✓ — Tüm takım ve ürünler güncellendi.');
 }
 
 // ════════════════════════════════════════════
