@@ -337,6 +337,7 @@ tbody tr:hover td { background: #fafafa; }
       <div class="sync-nokta bekliyor" id="syncNokta"></div>
       <span id="syncYazi">Bağlanıyor...</span>
     </div>
+    <button class="btn" onclick="jsonImportAc()">⬆ Yedek İmport</button>
     <button class="btn" onclick="excelIndir()">⬇ Excel</button>
     <button class="cikis-btn" onclick="cikisYap()" title="Çıkış Yap">⎋ Çıkış</button>
   </div>
@@ -438,6 +439,18 @@ tbody tr:hover td { background: #fafafa; }
       </div>
 
       <div class="yonetim-kart" style="grid-column:1/-1">
+        <div class="yonetim-kart-baslik">↕ Ürün Sırasını Düzenle</div>
+        <div class="yonetim-kart-icerik">
+          <div class="form-alan">
+            <label>Takım Seç</label>
+            <select id="urunSiraT" onchange="urunSiralama_goster()"></select>
+          </div>
+          <p style="font-size:12px;color:#888;margin-bottom:10px">Ürünleri sürükleyerek istediğiniz sıraya getirin.</p>
+          <div id="urun-siralama-listesi" style="display:flex;flex-direction:column;gap:4px;max-height:360px;overflow-y:auto"></div>
+        </div>
+      </div>
+
+      <div class="yonetim-kart" style="grid-column:1/-1">
         <div class="yonetim-kart-baslik">↕ Takım Sırasını Düzenle</div>
         <div class="yonetim-kart-icerik">
           <p style="font-size:12px;color:#888;margin-bottom:10px">Takımları sürükleyerek istediğiniz sıraya getirin.</p>
@@ -485,6 +498,24 @@ tbody tr:hover td { background: #fafafa; }
   </div>
 </div>
 
+<!-- JSON IMPORT MODAL -->
+<div class="modal-arka" id="jsonImportModal">
+  <div class="modal" style="width:460px;max-width:96vw">
+    <h2>⬆ Yedek JSON İmport</h2>
+    <p class="modal-alt">Firebase'den daha önce dışa aktardığınız JSON dosyasını seçin. Yalnızca <b>depo adetleri (d)</b> ve <b>notlar (n)</b> güncellenir; ürün listesi ve takımlar değişmez.</p>
+    <div class="form-alan">
+      <label>JSON Dosyası Seç</label>
+      <input type="file" id="jsonImportDosya" accept=".json" style="padding:6px;font-size:13px">
+    </div>
+    <div id="jsonImportOnizleme" style="display:none;margin-top:8px;background:#f9f9f9;border:1px solid #ddd;border-radius:6px;padding:10px;font-size:12px;max-height:200px;overflow-y:auto"></div>
+    <div id="jsonImportHata" style="display:none;color:#c0392b;font-size:12px;margin-top:8px"></div>
+    <div class="modal-altbar">
+      <button class="btn" onclick="modalKapat('jsonImportModal')">Vazgeç</button>
+      <button class="btn btn-ana" id="jsonImportUygula" onclick="jsonImportUygula()" disabled>Uygula</button>
+    </div>
+  </div>
+</div>
+
 <div id="bildirim"></div>
 
 <!-- Firebase SDK -->
@@ -500,73 +531,174 @@ let RENKLER = {
   'BELLA':'#c0737a','BİANCA':'#5b8fa8','ARWEN':'#b56a42','LAİLA':'#5c7fa3',
   'VENA':'#b58a3a','IRONY':'#7a6fa8','LEGEND':'#4a8a7c','LEGEND MOON':'#4a8a9c',
   'LORA':'#b06080','MİA':'#6a8f50','BABYCUTE GRİ':'#7a7a8a','MONTE':'#5a7a8a',
-  'NEO GRİ RANZA':'#888','NEO SARI RANZA':'#9a8a3a',
+  'SENTO':'#5b8fa8','ORİGAMİ':'#b56a42','CAM KAPAK':'#5b8fa8','BEYAZ KABİN':'#5b8fa8',
+  'YATAKLAR':'#5b8fa8','ROOX':'#5b8fa8','CORSO':'#5b8fa8','NEO GRİ':'#5b8fa8',
+  'NEO SARI':'#5b8fa8','NEW OPTIONS':'#5b8fa8','SENTO BEYAZ':'#5b8fa8',
+  'SANDALYELER':'#5b8fa8','ETTO':'#5b8fa8',
 };
 
 const BAŞ_VERİ = {
   'BELLA':[
-    {m:'1 KAPAKLI DOLAP',d:'-',n:''},{m:'2 KAPAKLI DOLAP',d:'-',n:''},{m:'3 KAPAKLI DOLAP',d:'1',n:''},
-    {m:'4 KAPAKLI DOLAP',d:'0',n:''},{m:'KÖŞE DOLAP',d:'-',n:''},{m:'SÜRGÜLÜ DOLAP',d:'-',n:''},
-    {m:'1 KAPAKLI KABİN',d:'-',n:''},{m:'2 KAPAKLI KABİN',d:'-',n:''},{m:'3 KAPAKLI KABİN',d:'-',n:''},
-    {m:"1'Lİ CAM KAPAK",d:'-',n:''},{m:"2'Lİ CAM KAPAK",d:'-',n:''},
-    {m:"1'Lİ AHŞAP KAPAK",d:'-',n:''},{m:"2'Lİ AHŞAP KAPAK",d:'-',n:''},{m:"3'LÜ AHŞAP KAPAK",d:'-',n:''},
-    {m:'ÇALIŞMA MASASI',d:'1',n:''},{m:'ÇALIŞMA MASASI ÜST MODÜL',d:'1',n:''},
-    {m:'ÇALIŞMA MASASI VE ÜST MODÜL',d:'-',n:''},{m:'PANOLU ÇALIŞMA MASASI',d:'-',n:''},
-    {m:'KİTAPLIK',d:'1',n:''},{m:'ŞİFONYER',d:'1',n:''},{m:'YÜKSEK ŞİFONYER',d:'-',n:''},
-    {m:'AYNA',d:'1',n:''},{m:'BOY AYNASI',d:'-',n:''},{m:'ŞİFONYER ÜST MODÜL',d:'-',n:''},
-    {m:'KOMODİN',d:'0',n:''},{m:'90X200 RANZA',d:'-',n:''},{m:'90X200 KARYOLA',d:'-',n:''},
-    {m:'90X190 KARYOLA',d:'-',n:''},{m:'100X200 KARYOLA',d:'1',n:''},{m:'120X200 KARYOLA',d:'3',n:''},
-    {m:'90X190 YAVRU KARYOLA',d:'0',n:''},{m:'80X180 YAVRU KARYOLA',d:'-',n:''},
-    {m:'70X130 SALLANIR BEŞİK',d:'-',n:''},{m:'100 LÜK BAZA BAŞLIĞI',d:'0',n:''},
-    {m:'120 LİK BAZA BAŞLIĞI',d:'0',n:''},{m:'100X200 PANEL BAZA',d:'0',n:''},
-    {m:'120X200 PANEL BAZA',d:'0',n:''},{m:'TODDLER',d:'-',n:''},
-    {m:'KARYOLA KORKULUĞU',d:'-',n:''},{m:'TAHT BEŞİK',d:'-',n:''},
+    {m:'3 KAPAKLI DOLAP',d:'1',n:''},{m:'ÇALIŞMA MASASI',d:'2',n:''},{m:'ÇALIŞMA MASASI ÜST MODÜL',d:'2',n:''},
+    {m:'KİTAPLIK',d:'0',n:''},{m:'ŞİFONYER',d:'2',n:''},{m:'AYNA',d:'2',n:''},
+    {m:'KOMODİN',d:'0',n:''},{m:'100X200 KARYOLA',d:'2',n:''},{m:'120X200 KARYOLA',d:'1',n:''},
+    {m:'100 LÜK BAZA BAŞLIĞI',d:'0',n:''},{m:'120 LİK BAZA BAŞLIĞI',d:'0',n:''},
   ],
   'BİANCA':[
-    {m:'3 KAPAKLI DOLAP',d:'1+2M',n:''},{m:'4 KAPAKLI DOLAP',d:'1',n:''},
-    {m:'ÇALIŞMA MASASI',d:'3+2M',n:''},{m:'ÇALIŞMA MASASI ÜST MODÜL',d:'3',n:''},
-    {m:'KİTAPLIK',d:'2+1M',n:''},{m:'ŞİFONYER',d:'3',n:''},{m:'AYNA',d:'3',n:''},
-    {m:'ŞİFONYER ÜST MODÜL',d:'0',n:''},{m:'KOMODİN',d:'2+1M',n:''},
-    {m:'100X200 KARYOLA',d:'2+1M',n:''},{m:'120X200 KARYOLA',d:'2',n:''},
-    {m:'90X190 YAVRU KARYOLA',d:'3',n:''},{m:'70X130 SALLANIR BEŞİK',d:'1',n:''},
+    {m:'3 KAPAKLI DOLAP',d:'3',n:''},{m:'4 KAPAKLI DOLAP',d:'1',n:''},
+    {m:'ÇALIŞMA MASASI',d:'3',n:''},{m:'ÇALIŞMA MASASI ÜST MODÜL',d:'3',n:''},
+    {m:'KİTAPLIK',d:'2',n:''},{m:'ŞİFONYER',d:'0',n:''},{m:'AYNA',d:'6',n:''},
+    {m:'ŞİFONYER ÜST MODÜL',d:'2',n:''},{m:'KOMODİN',d:'2',n:''},
+    {m:'100X200 KARYOLA',d:'3',n:''},{m:'120X200 KARYOLA',d:'1',n:''},
+    {m:'90X190 YAVRU KARYOLA',d:'0',n:''},{m:'70X130 SALLANIR BEŞİK',d:'0',n:''},
     {m:'100 LÜK BAZA BAŞLIĞI',d:'2',n:''},{m:'120 LİK BAZA BAŞLIĞI',d:'2',n:''},
-    {m:"100'LÜK KARYOLA DÖŞEMESİ",d:'2+1M',n:''},{m:"120'LİK KARYOLA DÖŞEMESİ",d:'2',n:''},
-    {m:'100X200 PANEL BAZA',d:'2',n:''},{m:'120X200 PANEL BAZA',d:'2',n:''},
-    {m:'TODDLER',d:'2',n:''},{m:'TODDLER DÖŞEME',d:'3',n:''},{m:'KARYOLA KORKULUĞU',d:'4',n:''},
+    {m:"100'LÜK KARYOLA DÖŞEMESİ",d:'3',n:''},{m:"120'LİK KARYOLA DÖŞEMESİ",d:'2',n:''},
+    {m:'100X200 PANEL BAZA',d:'3',n:'ULTRA BEYAZ'},{m:'120X200 PANEL BAZA',d:'2',n:'ULTRA BEYAZ'},
+    {m:'TODDLER',d:'0',n:''},{m:'TODDLER DÖŞEME',d:'0',n:''},
+    {m:'BAZALI KARYOLA 100X200',d:'2',n:''},{m:'BAZALI KARYOLA DÖŞEMESİ 100X200',d:'2',n:''},
   ],
   'ARWEN':[
-    {m:'KÖŞE DOLAP',d:'1',n:''},{m:'1 KAPAKLI KABİN',d:'1',n:''},{m:'2 KAPAKLI KABİN',d:'1',n:''},
-    {m:'3 KAPAKLI KABİN',d:'1',n:''},{m:"1'Lİ CAM KAPAK",d:'0',n:''},
-    {m:"2'Lİ CAM KAPAK",d:'3+1Lİ',n:''},{m:"1'Lİ AHŞAP KAPAK",d:'0',n:''},
-    {m:"2'Lİ AHŞAP KAPAK",d:'3',n:''},{m:"3'LÜ AHŞAP KAPAK",d:'3',n:''},
-    {m:'KİTAPLIK',d:'2',n:''},{m:'ŞİFONYER',d:'2',n:''},{m:'YÜKSEK ŞİFONYER',d:'0',n:''},
-    {m:'AYNA',d:'2',n:''},{m:'BOY AYNASI',d:'0',n:''},{m:'KOMODİN',d:'3',n:''},
+    {m:'KÖŞE DOLAP',d:'3',n:''},{m:'1 KAPAKLI KABİN',d:'2',n:''},{m:'2 KAPAKLI KABİN',d:'2',n:''},
+    {m:'3 KAPAKLI KABİN',d:'2',n:''},{m:"1'Lİ CAM KAPAK",d:'0',n:''},
+    {m:"2'Lİ CAM KAPAK",d:'0',n:''},{m:"1'Lİ AHŞAP KAPAK",d:'1',n:''},
+    {m:"2'Lİ AHŞAP KAPAK",d:'1',n:''},{m:"3'LÜ AHŞAP KAPAK",d:'2',n:''},
+    {m:'KİTAPLIK',d:'3',n:''},{m:'ŞİFONYER',d:'2',n:''},{m:'YÜKSEK ŞİFONYER',d:'2',n:''},
+    {m:'AYNA',d:'2',n:''},{m:'BOY AYNASI',d:'1',n:''},{m:'KOMODİN',d:'1',n:''},
+    {m:'100X200 KARYOLA',d:'2',n:'PAKET SAYISI 7'},{m:'120X200 KARYOLA',d:'2',n:'PAKET SAYISI 8'},
+    {m:'BAZALI KARYOLA 100X200',d:'1',n:''},{m:'Ç.MASASI VE ÜST MODÜL',d:'4',n:''},
+  ],
+  'LAİLA':[
+    {m:'ÇALIŞMA MASASI',d:'-',n:''},{m:'KİTAPLIK',d:'-',n:''},{m:'ŞİFONYER',d:'-',n:''},
+    {m:'KOMODİN',d:'-',n:''},{m:'100X200 KARYOLA',d:'1',n:''},{m:'120X200 KARYOLA',d:'-',n:''},
+  ],
+  'VENA':[
+    {m:'ÇALIŞMA MASASI',d:'2',n:''},{m:'ÇALIŞMA MASA ÜST MODÜL',d:'4',n:'?'},
+    {m:'ŞİFONYER',d:'2',n:''},{m:'ŞİFONYER AYNASI',d:'3',n:''},
+    {m:'YÜKSEK ŞİFONYER',d:'1',n:''},{m:'KİTAPLIK',d:'1',n:''},
+    {m:'KOMODİN',d:'2',n:''},{m:'100X200 KARYOLA',d:'2',n:''},{m:'120X200 KARYOLA',d:'2',n:''},
+    {m:'100X200 BAZALI KARYOLA',d:'-',n:''},
+  ],
+  'IRONY':[
+    {m:'ÇALIŞMA MASASI',d:'-',n:''},{m:'KİTAPLIK',d:'-',n:''},
+    {m:'ŞİFONYER',d:'-',n:''},{m:'KOMODİN',d:'-',n:''},
+  ],
+  'LEGEND':[
+    {m:'KİTAPLIK',d:'1',n:''},{m:'KOMODİN',d:'2',n:''},
     {m:'100X200 KARYOLA',d:'3',n:''},{m:'120X200 KARYOLA',d:'3',n:''},
-    {m:'90X190 YAVRU KARYOLA',d:'0',n:''},{m:'100 LÜK BAZA BAŞLIĞI',d:'0',n:''},
-    {m:'120 LİK BAZA BAŞLIĞI',d:'0',n:''},{m:'100X200 PANEL BAZA',d:'0',n:''},{m:'120X200 PANEL BAZA',d:'0',n:''},
+    {m:'KÖŞE KABİN',d:'2',n:''},{m:'1 Lİ KABİN',d:'1',n:''},{m:'2 Lİ KABİN',d:'2',n:''},
+    {m:'3 LÜ KABİN',d:'3',n:''},{m:'ÇALIŞMA MASA VE ÜST MODÜL',d:'3',n:''},
+    {m:'ÇALIŞMA MASA/ALT',d:'2',n:''},{m:'ŞİFONYER',d:'2',n:''},{m:'ŞİFONYER AYNASI',d:'2',n:''},
+    {m:'YÜKSEK ŞİFONYER',d:'1',n:''},{m:'120 CM BAŞLIK',d:'2',n:''},{m:'100 CM BAŞLIK',d:'1',n:''},
+    {m:'PANEL BAZA/ANTRASİT 100X200',d:'1',n:''},{m:'PANEL BAZA/ANTRASİT 120X200',d:'1',n:''},
+    {m:'BAZALI KARYOLA/CEVİZ 100X200',d:'1',n:''},
+    {m:'1 Lİ KAPAK/ANTRASİT',d:'1',n:''},{m:'2 Lİ KAPAK/ANTRASİT',d:'-',n:''},
+    {m:'3 LÜ KAPAK ANTRASİT',d:'3',n:''},
   ],
-  'LAİLA':[{m:'1 KAPAKLI DOLAP',d:'-',n:''},{m:'2 KAPAKLI DOLAP',d:'-',n:''},{m:'ÇALIŞMA MASASI',d:'-',n:''},{m:'KİTAPLIK',d:'-',n:''},{m:'ŞİFONYER',d:'-',n:''},{m:'KOMODİN',d:'-',n:''},{m:'90X200 RANZA',d:'-',n:''},{m:'100X200 KARYOLA',d:'-',n:''},{m:'120X200 KARYOLA',d:'-',n:''}],
-  'VENA':[{m:'1 KAPAKLI DOLAP',d:'-',n:''},{m:'2 KAPAKLI DOLAP',d:'-',n:''},{m:'3 KAPAKLI DOLAP',d:'-',n:''},{m:'ÇALIŞMA MASASI',d:'-',n:''},{m:'KİTAPLIK',d:'-',n:''},{m:'ŞİFONYER',d:'-',n:''},{m:'KOMODİN',d:'-',n:''},{m:'90X200 RANZA',d:'-',n:''}],
-  'IRONY':[{m:'1 KAPAKLI DOLAP',d:'-',n:''},{m:'2 KAPAKLI DOLAP',d:'-',n:''},{m:'ÇALIŞMA MASASI',d:'-',n:''},{m:'KİTAPLIK',d:'-',n:''},{m:'ŞİFONYER',d:'-',n:''},{m:'KOMODİN',d:'-',n:''}],
-  'LEGEND':[{m:'1 KAPAKLI DOLAP',d:'-',n:''},{m:'2 KAPAKLI DOLAP',d:'-',n:''},{m:'3 KAPAKLI DOLAP',d:'-',n:''},{m:'ÇALIŞMA MASASI',d:'-',n:''},{m:'KİTAPLIK',d:'-',n:''},{m:'ŞİFONYER',d:'-',n:''},{m:'KOMODİN',d:'-',n:''},{m:'90X200 RANZA',d:'-',n:''},{m:'100X200 KARYOLA',d:'-',n:''},{m:'120X200 KARYOLA',d:'-',n:''}],
-  'LEGEND MOON':[{m:'3 KAPAKLI DOLAP',d:'-',n:''},{m:'ÇALIŞMA MASASI',d:'-',n:''},{m:'KİTAPLIK',d:'-',n:''},{m:'ŞİFONYER',d:'-',n:''},{m:'KOMODİN',d:'-',n:''}],
-  'LORA':[{m:'1 KAPAKLI DOLAP',d:'-',n:''},{m:'2 KAPAKLI DOLAP',d:'-',n:''},{m:'ÇALIŞMA MASASI',d:'-',n:''},{m:'KİTAPLIK',d:'-',n:''},{m:'ŞİFONYER',d:'-',n:''},{m:'KOMODİN',d:'-',n:''}],
-  'MİA':[{m:'1 KAPAKLI DOLAP',d:'-',n:''},{m:'2 KAPAKLI DOLAP',d:'-',n:''},{m:'3 KAPAKLI DOLAP',d:'-',n:''},{m:'ÇALIŞMA MASASI',d:'-',n:''},{m:'KİTAPLIK',d:'-',n:''},{m:'ŞİFONYER',d:'-',n:''},{m:'KOMODİN',d:'-',n:''}],
-  'BABYCUTE GRİ':[{m:'3 KAPAKLI DOLAP',d:'-',n:''},{m:'ÇALIŞMA MASASI',d:'-',n:''},{m:'KİTAPLIK',d:'-',n:''},{m:'KOMODİN',d:'-',n:''},{m:'90X200 RANZA',d:'-',n:''}],
+  'LEGEND MOON':[
+    {m:'ÇALIŞMA MASASI VE ÜSTÜ',d:'2',n:''},{m:'KARYOLA 100X200',d:'3',n:''},{m:'KARYOLA 120X200',d:'2',n:''},
+    {m:'BAZA BAŞLIK 100 CM',d:'1',n:''},{m:'BAZA BAŞLIK 120 CM',d:'-',n:''},
+    {m:'BAZALI KARYOLA 100X200',d:'-',n:''},{m:'ŞİFONYER',d:'1',n:''},
+    {m:'ŞİFONYER AYNASI',d:'1',n:''},{m:'YÜKSEK ŞİFONYER',d:'1',n:''},
+    {m:'KİTAPLIK',d:'-',n:''},{m:'KOMODİN',d:'2',n:''},
+  ],
+  'LORA':[
+    {m:'1 KAPAKLI DOLAP',d:'-',n:''},{m:'2 KAPAKLI DOLAP',d:'-',n:''},
+    {m:'ÇALIŞMA MASASI',d:'-',n:''},{m:'KİTAPLIK',d:'-',n:''},
+    {m:'ŞİFONYER',d:'-',n:''},{m:'KOMODİN',d:'-',n:''},{m:'2LI DOLAP',d:'-',n:''},
+  ],
+  'MİA':[
+    {m:'2 KAPAKLI DOLAP',d:'-',n:''},{m:'3 KAPAKLI DOLAP',d:'-',n:''},
+    {m:'KİTAPLIK',d:'-',n:''},{m:'ŞİFONYER',d:'-',n:''},{m:'KOMODİN',d:'-',n:''},
+  ],
+  'BABYCUTE GRİ':[
+    {m:'3 KAPAKLI DOLAP',d:'-',n:''},{m:'ÇALIŞMA MASASI',d:'-',n:''},
+    {m:'KİTAPLIK',d:'-',n:''},{m:'KOMODİN',d:'-',n:''},{m:'90X200 RANZA',d:'-',n:''},
+  ],
   'MONTE':[
-    {m:'2 KAPAKLI DOLAP',d:'0',n:''},{m:'3 KAPAKLI DOLAP',d:'2M',n:''},{m:'4 KAPAKLI DOLAP',d:'0',n:''},
-    {m:'5 KAPAKLI DOLAP',d:'0',n:''},{m:'ÇALIŞMA MASASI',d:'4+1m',n:''},{m:'ÇALIŞMA MASASI ÜST MODÜL',d:'4+1m',n:''},
-    {m:'KİTAPLIK',d:'1m',n:''},{m:'ŞİFONYER',d:'0',n:''},{m:'YÜKSEK ŞİFONYER',d:'1',n:''},
-    {m:'AYNA',d:'7',n:''},{m:'ŞİFONYER ÜST MODÜL',d:'2',n:''},{m:'KOMODİN',d:'4',n:''},
-    {m:'90X200 RANZA',d:'1',n:''},{m:'100X200 KARYOLA',d:'3',n:''},{m:'120X200 KARYOLA',d:'3',n:''},
-    {m:'100X200 BAZALI KARYOLA',d:'1M',n:''},{m:'120X200 BAZALI KARYOLA',d:'0',n:''},
-    {m:'90X190 YAVRU KARYOLA',d:'2KR+2MŞ',n:''},{m:'80x175 YAVRU KARYOLA',d:'0',n:''},
-    {m:'80X180 BÜYÜYEN KARYOLA',d:'0',n:''},{m:'100 LÜK BAZA BAŞLIĞI',d:'3',n:''},
-    {m:'120 LİK BAZA BAŞLIĞI',d:'1',n:''},{m:'100X200 PANEL BAZA',d:'0',n:''},{m:'120X200 PANEL BAZA',d:'0',n:''},
-    {m:'TODDLER',d:'1M',n:''},{m:'KARYOLA KORKULUĞU',d:'3',n:''},{m:'TAHT BEŞİK',d:'0',n:''},
+    {m:'2 KAPAKLI DOLAP',d:'0',n:''},{m:'3 KAPAKLI DOLAP',d:'3',n:''},
+    {m:'4 KAPAKLI DOLAP',d:'5',n:''},{m:'5 KAPAKLI DOLAP',d:'1',n:''},
+    {m:'ÇALIŞMA MASASI',d:'0',n:''},{m:'ÇALIŞMA MASASI ÜST MODÜL',d:'0',n:''},
+    {m:'KİTAPLIK',d:'0',n:''},{m:'ŞİFONYER',d:'0',n:''},{m:'YÜKSEK ŞİFONYER',d:'0',n:''},
+    {m:'AYNA',d:'0',n:''},{m:'ŞİFONYER ÜST MODÜL',d:'0',n:''},{m:'KOMODİN',d:'1',n:''},
+    {m:'90X200 RANZA',d:'3',n:''},{m:'100X200 KARYOLA',d:'0',n:''},{m:'120X200 KARYOLA',d:'0',n:''},
+    {m:'100X200 BAZALI KARYOLA',d:'3',n:''},{m:'90X190 YAVRU KARYOLA',d:'2MEŞE',n:''},
+    {m:'80x175 YAVRU KARYOLA',d:'0',n:''},{m:'80X180 BÜYÜYEN KARYOLA',d:'0',n:''},
+    {m:'100 LÜK BAZA BAŞLIĞI',d:'0',n:''},{m:'120 LİK BAZA BAŞLIĞI',d:'0',n:''},
+    {m:'100X200 PANEL BAZA',d:'6/MEŞE',n:''},{m:'120X200 PANEL BAZA',d:'1/MEŞE',n:''},
+    {m:'TODDLER',d:'0',n:''},{m:'KARYOLA KORKULUĞU',d:'0',n:''},{m:'TAHT BEŞİK',d:'0',n:''},
+    {m:'3 KAPAKLI ÇEKMECELI DOLAP',d:'2',n:''},{m:'KOMODİN TEK ÇEKMECE',d:'1',n:''},
+    {m:'TODDLER/LİTE 90X190',d:'3',n:'2 YAVRU'},{m:'GENİŞ ŞİFONYER',d:'1',n:''},
+    {m:'ALLURE RANZA/90X200',d:'1/KREM',n:''},
   ],
-  'NEO GRİ RANZA':[{m:'1 KAPAKLI DOLAP',d:'0',n:''},{m:'2 KAPAKLI DOLAP',d:'0',n:''},{m:'5 KAPAKLI DOLAP',d:'0',n:''},{m:'ÇALIŞMA MASASI',d:'0',n:''},{m:'ŞİFONYER',d:'0',n:''},{m:'90X200 RANZA',d:'0',n:''},{m:'90X190 KARYOLA',d:'1',n:''}],
-  'NEO SARI RANZA':[{m:'1 KAPAKLI DOLAP',d:'0',n:''},{m:'2 KAPAKLI DOLAP',d:'0',n:''},{m:'5 KAPAKLI DOLAP',d:'0',n:''},{m:'ÇALIŞMA MASASI',d:'0',n:''},{m:'ŞİFONYER',d:'0',n:''},{m:'90X200 RANZA',d:'1',n:''},{m:'90X190 KARYOLA',d:'1',n:''},{m:'90X190 YAVRU KARYOLA',d:'1GRİ',n:''}],
+  'SENTO':[],
+  'ORİGAMİ':[
+    {m:'3 KAPAKLI DOLAP',d:'1',n:''},{m:'4 KAPAKLI DOLAP',d:'1',n:''},
+    {m:'KARYOLA 100X200',d:'2',n:''},{m:'KARYOLA 120X200',d:'2',n:''},
+    {m:'ÇALIŞMA MASASI',d:'-',n:''},{m:'ÇALIŞMA MASA ÜST MODÜL',d:'4',n:''},
+    {m:'ÇALIŞMA MASASI/ LİTE',d:'-',n:''},{m:'ŞİFONYER',d:'1',n:''},
+    {m:'ŞİONYER AYNASI',d:'-',n:''},{m:'KİTAPLIK',d:'1',n:''},
+    {m:'KOMODİN',d:'-',n:''},{m:'BAZA BAŞLIK 100 CM',d:'3',n:''},
+    {m:'BAZA BAŞLIK 120 CM',d:'1',n:''},
+  ],
+  'CAM KAPAK':[
+    {m:'1Lİ SİYAH CAM',d:'-',n:''},{m:'2 Lİ SİYAH CAM',d:'2',n:''},
+    {m:'1 Lİ ANTRASİT CAM',d:'-',n:''},{m:'2 Lİ ANTRASİT CAM',d:'4',n:''},
+  ],
+  'BEYAZ KABİN':[
+    {m:'1 Lİ KABİN',d:'1',n:''},{m:'2 Lİ KABİN',d:'7',n:''},
+    {m:'3 LÜ KABİN',d:'3',n:''},{m:'KÖŞE KABİN',d:'2',n:''},
+  ],
+  'YATAKLAR':[
+    {m:'70X130 SOFT',d:'1',n:''},{m:'90X190 SOFT',d:'1',n:''},{m:'90X200 SOFT',d:'3',n:''},
+    {m:'90X190 PRETTY',d:'-',n:''},{m:'90X200 PRETTY',d:'-',n:''},
+    {m:'100X200 PRETTY',d:'-',n:''},{m:'120X200 PRETTY',d:'-',n:''},
+    {m:'90X200 TREND',d:'-',n:''},{m:'100X200 TREND',d:'-',n:''},{m:'120X200 TREND',d:'-',n:''},
+    {m:'90X200 PRİME',d:'-',n:''},{m:'100X200 PRİME',d:'-',n:''},{m:'120X200 PRİME',d:'-',n:''},
+    {m:'90X195X12 SOFT',d:'1',n:''},
+  ],
+  'ROOX':[
+    {m:'3 LÜ DOLAP',d:'-',n:''},{m:'ÇALIŞMA/OYUNCU MASASI',d:'-',n:''},
+    {m:'ŞİFONYER',d:'-',n:''},{m:'ŞİFONYER AYNASI',d:'-',n:''},
+    {m:'KİTAPLIK',d:'-',n:''},{m:'KOMODİN',d:'-',n:''},
+    {m:'KARYOLA 100X200',d:'1',n:''},{m:'KARYOLA 120X200',d:'-',n:''},
+    {m:'YATAK BAŞI NEON/YUVARLAK',d:'2',n:''},{m:'Ç.MASA ÜSTÜ/NEON',d:'3',n:''},
+    {m:'OYUNCU KOLTUĞU',d:'1',n:''},
+  ],
+  'CORSO':[
+    {m:'3 KAPAKLI DOLAP',d:'2',n:''},{m:'ÇEKMECELİ 3 KAPAKLI DOLAP',d:'2',n:''},
+    {m:'4 KAPAKLI DOLAP',d:'2',n:''},{m:'ÇALIŞMA MASASI/LARGE',d:'2',n:''},
+    {m:'ÇALIŞMA MASASI/SMALL',d:'1',n:''},{m:'ŞİFONYER',d:'2',n:''},
+    {m:'ŞİFONYER AYNASI',d:'2',n:''},{m:'YÜKSEK ŞİFONYER',d:'1',n:''},
+    {m:'KİTAPLIK',d:'1',n:''},{m:'KOMODİN',d:'1',n:''},
+    {m:'100X200 KARYOLA',d:'3',n:''},{m:'120X200 KARYOLA',d:'-',n:''},
+    {m:'100X200 BAZALI KARYOLA',d:'2',n:''},{m:'TODDLER KARYOLA 90X200',d:'-',n:''},
+    {m:'TODDLER YAVRU KARYOLA 90X190',d:'2',n:''},
+  ],
+  'NEO GRİ':[
+    {m:'NEO RANZA',d:'1',n:''},{m:'YAVRU KARYOLA',d:'2',n:'GRİ'},
+    {m:'ÇALIŞMA MASASI/BÜYÜK',d:'1',n:''},
+  ],
+  'NEO SARI':[],
+  'NEW OPTIONS':[
+    {m:'RANZA',d:'1',n:''},{m:'KARYOLA 90X200',d:'1',n:''},
+    {m:'ÇALIŞMA MASASI',d:'1',n:''},{m:'YAVRU KARYOLA/VİZON',d:'1',n:''},
+  ],
+  'SENTO BEYAZ':[],
+  'SANDALYELER':[
+    {m:'SMART/KAHVE',d:'7',n:''},{m:'SMART/GRİ',d:'1',n:''},{m:'SMART/SİYAH',d:'-',n:''},
+    {m:'NAZ/PEMBE',d:'7',n:''},{m:'NAZ/BEYAZ',d:'2',n:''},{m:'RİGA/GRİ',d:'3',n:''},
+    {m:'ZUMA/GRİ',d:'4',n:''},{m:'ZUMA/KREM',d:'-',n:''},{m:'VİENNA/YEŞİL',d:'-',n:''},
+    {m:'VİENNA/KREM',d:'2',n:''},{m:'BOON SANDALYE',d:'-',n:''},{m:'COMFY DİNLENME KOLTUĞU',d:'2',n:''},
+  ],
+  'ETTO':[
+    {m:'3 KAPAKLI DOLAP',d:'2',n:''},{m:'3 KAPAKLI ÇEKMECELİ DOLAP',d:'1',n:''},
+    {m:'4 KAPAKLI DOLAP',d:'3',n:''},{m:'ÇALIŞMA MASASI',d:'2',n:''},
+    {m:'ÇALIŞMA MASASI ÜST MODÜL',d:'2',n:''},{m:'KAPAKLI KİTAPLIK',d:'2',n:''},
+    {m:'KİTAPLIK',d:'-',n:''},{m:'ŞİFONYER',d:'2',n:''},{m:'ŞİFONYER AYNASI',d:'1',n:''},
+    {m:'YÜKSEK ŞİFONYER',d:'2',n:''},{m:'KARYOLA 100X200',d:'4',n:''},
+    {m:'KARYOLA 120X200',d:'-',n:''},{m:'BAZALI KARYOLA 100X200',d:'2',n:''},
+    {m:'KOMODİN',d:'2',n:''},
+  ],
   'ESKİ':[
     {m:'ELEGANT BEYAZ 3 KAPAKLI DOLAP',d:'0',n:''},{m:'ELEGANT BEYAZ Ç.MASASI',d:'0',n:''},
     {m:'ELEGANT BEYAZ KİTAPLIK',d:'0',n:''},{m:'ELEGANT BEYAZ ŞİFONYER',d:'0',n:''},
@@ -748,7 +880,7 @@ let gecmis      = [];
 let secilen     = 'TÜMÜ';
 let gecmisAcik  = false;
 let duzTk = '', duzIdx = -1;
-let takimSirasi = Object.keys(RENKLER);
+let takimSirasi = ['BELLA','BİANCA','ARWEN','LAİLA','VENA','IRONY','LEGEND','LEGEND MOON','LORA','MİA','BABYCUTE GRİ','MONTE','SENTO','ORİGAMİ','CAM KAPAK','BEYAZ KABİN','YATAKLAR','ROOX','CORSO','NEO GRİ','NEO SARI','NEW OPTIONS','SENTO BEYAZ','SANDALYELER','ETTO'];
 let surukleKaynagi = null;
 
 function sirasiSenkronize() {
@@ -927,7 +1059,9 @@ function yonetimPanelDoldur() {
   const hepsi=[...anaListesi(),'ESKİ','HALI'];
   document.getElementById('ueT').innerHTML=hepsi.map(t=>`<option value="${t}">${t}</option>`).join('');
   document.getElementById('usT').innerHTML=hepsi.map(t=>`<option value="${t}">${t}</option>`).join('');
+  document.getElementById('urunSiraT').innerHTML=hepsi.map(t=>`<option value="${t}">${t}</option>`).join('');
   urunSilListeGoster();
+  urunSiralama_goster();
   siralama_goster();
 }
 
@@ -1035,6 +1169,142 @@ function siralama_bitti() {
 }
 
 // ════════════════════════════════════════════
+// JSON YEDEK İMPORT
+// ════════════════════════════════════════════
+let jsonImportData = null;
+
+function jsonImportAc() {
+  jsonImportData = null;
+  document.getElementById('jsonImportDosya').value = '';
+  document.getElementById('jsonImportOnizleme').style.display = 'none';
+  document.getElementById('jsonImportHata').style.display = 'none';
+  document.getElementById('jsonImportUygula').disabled = true;
+  document.getElementById('jsonImportModal').classList.add('acik');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('jsonImportDosya').addEventListener('change', function(e) {
+    const dosya = e.target.files[0];
+    if (!dosya) return;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      const hataEl = document.getElementById('jsonImportHata');
+      const onizEl = document.getElementById('jsonImportOnizleme');
+      hataEl.style.display = 'none';
+      onizEl.style.display = 'none';
+      document.getElementById('jsonImportUygula').disabled = true;
+      jsonImportData = null;
+      try {
+        const parsed = JSON.parse(ev.target.result);
+        // Firebase formatı: {veri:{...}, gecmis:[...], ...} veya doğrudan {BELLA:[...], ...}
+        const veriObj = parsed.veri || parsed;
+        if (typeof veriObj !== 'object' || Array.isArray(veriObj)) throw new Error('Geçersiz format');
+        // Önizleme: kaç takım, kaç ürün güncellenecek
+        let guncellenecek = 0, bulunan = 0, bulunamayan = [];
+        Object.keys(veriObj).forEach(takim => {
+          const mevcutTakim = veri[takim];
+          if (!mevcutTakim) { bulunamayan.push(takim); return; }
+          (veriObj[takim] || []).forEach(yeniUrun => {
+            const mevcutUrun = mevcutTakim.find(u => u.m === yeniUrun.m);
+            if (mevcutUrun) {
+              if (mevcutUrun.d !== yeniUrun.d || mevcutUrun.n !== yeniUrun.n) guncellenecek++;
+              bulunan++;
+            }
+          });
+        });
+        jsonImportData = veriObj;
+        let html = `<b style="color:#2e7d51">✓ Dosya okundu</b><br><br>`;
+        html += `<b>${bulunan}</b> eşleşen ürün bulundu, <b>${guncellenecek}</b> tanesi güncelleme gerektirecek.<br>`;
+        if (bulunamayan.length) html += `<br><span style="color:#e67e22">⚠ Mevcut veride bulunmayan takımlar (atlanacak): ${bulunamayan.join(', ')}</span>`;
+        onizEl.innerHTML = html;
+        onizEl.style.display = 'block';
+        document.getElementById('jsonImportUygula').disabled = false;
+      } catch(err) {
+        hataEl.textContent = 'JSON okunamadı: ' + err.message;
+        hataEl.style.display = 'block';
+      }
+    };
+    reader.readAsText(dosya);
+  });
+});
+
+function jsonImportUygula() {
+  if (!jsonImportData) return;
+  let toplam = 0;
+  Object.keys(jsonImportData).forEach(takim => {
+    if (!veri[takim]) return;
+    (jsonImportData[takim] || []).forEach(yeniUrun => {
+      const mevcutUrun = veri[takim].find(u => u.m === yeniUrun.m);
+      if (mevcutUrun) {
+        const eskiD = mevcutUrun.d, eskiN = mevcutUrun.n;
+        mevcutUrun.d = yeniUrun.d !== undefined ? yeniUrun.d : mevcutUrun.d;
+        mevcutUrun.n = yeniUrun.n !== undefined ? yeniUrun.n : mevcutUrun.n;
+        if (mevcutUrun.d !== eskiD || mevcutUrun.n !== eskiN) toplam++;
+      }
+    });
+  });
+  if (toplam === 0) { bildir('Değiştirilecek kayıt bulunamadı.', true); return; }
+  logEkle('SİSTEM', 'JSON İmport', toplam + ' ürün güncellendi');
+  renderTablo();
+  modalKapat('jsonImportModal');
+  bildir(toplam + ' ürün JSON\'dan güncellendi ✓');
+}
+
+// ════════════════════════════════════════════
+// ÜRÜN SIRALAMA SÜRÜKLE-BIRAK
+// ════════════════════════════════════════════
+let urunSurukleKaynagi = null;
+
+function urunSiralama_goster() {
+  const tk = document.getElementById('urunSiraT').value;
+  const el = document.getElementById('urun-siralama-listesi');
+  if (!el) return;
+  const liste = veri[tk] || [];
+  if (!liste.length) { el.innerHTML = '<p style="font-size:13px;color:#aaa;padding:8px 0">Bu takımda ürün yok.</p>'; return; }
+  el.innerHTML = liste.map((r, i) => `
+    <div class="siralama-satir" draggable="true" data-idx="${i}"
+      ondragstart="urunSura_baslat(event,${i},'${tk}')"
+      ondragover="urunSura_uzerinde(event)"
+      ondrop="urunSura_birak(event,${i},'${tk}')"
+      ondragend="urunSura_bitti()">
+      <span class="siralama-tutac">⠿</span>
+      <span class="siralama-sira">${i+1}</span>
+      <span class="menu-nokta" style="background:${RENKLER[tk]||'#aaa'}"></span>
+      <span style="flex:1">${r.m}</span>
+      <span style="font-size:11px;color:#bbb">${r.d||'-'}</span>
+    </div>`).join('');
+}
+
+function urunSura_baslat(e, idx, tk) {
+  urunSurukleKaynagi = idx;
+  e.currentTarget.classList.add('surukleniyor');
+  e.dataTransfer.effectAllowed = 'move';
+}
+function urunSura_uzerinde(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  document.querySelectorAll('#urun-siralama-listesi .siralama-satir').forEach(el => el.classList.remove('uzerine-geldi'));
+  e.currentTarget.classList.add('uzerine-geldi');
+}
+function urunSura_birak(e, hedefIdx, tk) {
+  e.preventDefault();
+  if (urunSurukleKaynagi === null || urunSurukleKaynagi === hedefIdx) return;
+  const liste = veri[tk];
+  const [alinan] = liste.splice(urunSurukleKaynagi, 1);
+  liste.splice(hedefIdx, 0, alinan);
+  tamVeriYaz();
+  if (secilen === tk || secilen === 'TÜMÜ') renderTablo();
+  urunSiralama_goster();
+  bildir(tk + ' ürün sırası güncellendi.');
+}
+function urunSura_bitti() {
+  urunSurukleKaynagi = null;
+  document.querySelectorAll('#urun-siralama-listesi .siralama-satir').forEach(el => {
+    el.classList.remove('surukleniyor', 'uzerine-geldi');
+  });
+}
+
+// ════════════════════════════════════════════
 // EXCEL
 // ════════════════════════════════════════════
 function excelIndir() {
@@ -1098,7 +1368,7 @@ function cikisYap() {
 // MODAL & BİLDİRİM
 // ════════════════════════════════════════════
 function modalKapat(id) { document.getElementById(id).classList.remove('acik'); }
-['depoDuzModal','notDuzModal'].forEach(id=>{
+['depoDuzModal','notDuzModal','jsonImportModal'].forEach(id=>{
   document.getElementById(id).addEventListener('click',function(e){if(e.target===this)modalKapat(id);});
 });
 document.getElementById('depoDuzInput').addEventListener('keydown',e=>{if(e.key==='Enter')depoDuzKaydet();});
